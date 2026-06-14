@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     console.log('Fetching YouTube metadata via oEmbed for:', url, 'with quality:', quality);
     
     // 1. Fetch metadata via oEmbed
-    let metadata = {
+    const metadata = {
       title: 'YouTube Video',
       author: 'YouTube Creator',
       thumbnail: 'https://i.ytimg.com/vi/3nvHyakGSZI/hq2.jpg'
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     // 2. Fetch direct download link from Cobalt instances
     let downloadUrl = null;
-    let errorMsg = 'Failed to extract download link from all Cobalt instances.';
+    const errorMsg = 'Failed to extract download link from all Cobalt instances.';
 
     for (const instance of COBALT_INSTANCES) {
       try {

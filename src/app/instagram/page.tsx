@@ -8,11 +8,8 @@ import {
 } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
 import LoadingState from '@/components/LoadingState';
-import ProfileOverview from '@/components/ProfileOverview';
-import StatsDashboard from '@/components/StatsDashboard';
 import VideoGallery from '@/components/VideoGallery';
 import PreviewModal from '@/components/PreviewModal';
-import EmptyState from '@/components/EmptyState';
 import Header from '@/components/Header';
 import { 
   isInstagramVideoUrl, 

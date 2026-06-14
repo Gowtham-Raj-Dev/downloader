@@ -1,0 +1,46 @@
+﻿
+> instagram-downloader@0.1.0 lint
+> eslint
+
+
+E:\Gowtham-Live\Instagram-downloader\src\app\api\youtube\route.ts
+  27:9  error  'metadata' is never reassigned. Use 'const' instead  prefer-const
+  48:9  error  'errorMsg' is never reassigned. Use 'const' instead  prefer-const
+
+E:\Gowtham-Live\Instagram-downloader\src\app\instagram\page.tsx
+  11:8  warning  'ProfileOverview' is defined but never used  @typescript-eslint/no-unused-vars
+  12:8  warning  'StatsDashboard' is defined but never used   @typescript-eslint/no-unused-vars
+  15:8  warning  'EmptyState' is defined but never used       @typescript-eslint/no-unused-vars
+
+E:\Gowtham-Live\Instagram-downloader\src\app\page.tsx
+  6:43  warning  'HelpCircle' is defined but never used  @typescript-eslint/no-unused-vars
+  6:55  warning  'Laptop' is defined but never used      @typescript-eslint/no-unused-vars
+  6:63  warning  'Film' is defined but never used        @typescript-eslint/no-unused-vars
+  6:69  warning  'Smartphone' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Gowtham-Live\Instagram-downloader\src\app\youtube\page.tsx
+    6:54  warning  'Eye' is defined but never used                          @typescript-eslint/no-unused-vars
+   17:3   warning  'generateDynamicYoutubeVideo' is defined but never used  @typescript-eslint/no-unused-vars
+  277:37  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  297:45  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  363:9   warning  'formatNumber' is assigned a value but never used        @typescript-eslint/no-unused-vars
+
+E:\Gowtham-Live\Instagram-downloader\src\components\InstaConnect.tsx
+  3:20  warning  'useEffect' is defined but never used      @typescript-eslint/no-unused-vars
+  3:31  warning  'useRef' is defined but never used         @typescript-eslint/no-unused-vars
+  6:18  warning  'MessageCircle' is defined but never used  @typescript-eslint/no-unused-vars
+  6:33  warning  'User' is defined but never used           @typescript-eslint/no-unused-vars
+  7:13  warning  'Eye' is defined but never used            @typescript-eslint/no-unused-vars
+  7:46  warning  'Pause' is defined but never used          @typescript-eslint/no-unused-vars
+  7:53  warning  'Search' is defined but never used         @typescript-eslint/no-unused-vars
+  8:77  warning  'Clipboard' is defined but never used      @typescript-eslint/no-unused-vars
+
+E:\Gowtham-Live\Instagram-downloader\src\components\VideoGallery.tsx
+  6:35  warning  'Pause' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Gowtham-Live\Instagram-downloader\src\components\YoutubeHeroSection.tsx
+  8:7  warning  'Youtube' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 24 problems (4 errors, 20 warnings)
+  2 errors and 0 warnings potentially fixable with the `--fix` option.
+

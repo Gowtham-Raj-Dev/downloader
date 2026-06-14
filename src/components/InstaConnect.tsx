@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Home, Compass, MessageCircle, User, LogOut, Lock, Check, 
-  Download, Eye, Heart, MessageSquare, Play, Pause, Search, 
-  Loader2, ExternalLink, RefreshCw, Monitor, AlertCircle, Link as LinkIcon, Clipboard
+  Home, Compass, LogOut, Lock, Check, 
+  Download, Heart, MessageSquare, Play, 
+  Loader2, ExternalLink, RefreshCw, Monitor, AlertCircle, Link as LinkIcon
 } from 'lucide-react';
 import { VideoItem, generateDynamicVideoFromUrl, isInstagramVideoUrl } from '../data/mockProfiles';
 

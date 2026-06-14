@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  LayoutGrid, List, Search, Play, Pause, Copy, Check, Download, 
+  LayoutGrid, List, Search, Play, Copy, Check, Download, 
   Eye, Calendar, Filter, ArrowUpDown, ChevronDown, Loader2 
 } from 'lucide-react';
 import { VideoItem } from '../data/mockProfiles';

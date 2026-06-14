@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { 
-  Sparkles, ShieldCheck, Zap, ArrowRight, HelpCircle, Laptop, Film, Smartphone, Globe
+  Sparkles, ShieldCheck, Zap, ArrowRight, Globe
 } from 'lucide-react';
 import Header from '@/components/Header';
 

@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowLeft, ShieldCheck, Sparkles, Heart, Download, Eye, Copy, Check, 
+  ArrowLeft, ShieldCheck, Sparkles, Heart, Download, Copy, Check, 
   ExternalLink, Play, Pause, Archive
 } from 'lucide-react';
 import YoutubeHeroSection from '@/components/YoutubeHeroSection';
@@ -14,9 +14,9 @@ import Header from '@/components/Header';
 import { 
   isYoutubeVideoUrl, 
   extractYoutubeId,
-  generateDynamicYoutubeVideo,
   YoutubeVideoItem
 } from '@/data/youtubeData';
+import { VideoItem } from '@/data/mockProfiles';
 
 // Custom Youtube SVG icon component
 const Youtube = (props: React.SVGProps<SVGSVGElement>) => (
@@ -274,8 +274,8 @@ export default function YoutubePage() {
     setZipProgress(0);
   };
 
-  const handleOpenPreview = (video: any) => {
-    setPreviewVideo(video);
+  const handleOpenPreview = (video: VideoItem) => {
+    setPreviewVideo(video as YoutubeVideoItem);
     const videosList = fetchedVideos.length > 0 ? fetchedVideos : [];
     const idx = videosList.findIndex(v => v.id === video.id);
     setPreviewVideoIndex(idx !== -1 ? idx + 1 : 1);
@@ -294,7 +294,7 @@ export default function YoutubePage() {
   };
 
   // Centralized download handler that supports streaming download with progress bar
-  const handleDownloadVideo = async (video: any) => {
+  const handleDownloadVideo = async (video: YoutubeVideoItem) => {
     if (isDownloading) return;
     setIsDownloading(true);
     setDownloadProgress(0);
@@ -360,13 +360,7 @@ export default function YoutubePage() {
     }
   };
 
-  const formatNumber = (num: number): string => {
-    return num >= 1000000 
-      ? (num / 1000000).toFixed(1) + 'M' 
-      : num >= 1000 
-        ? (num / 1000).toFixed(1) + 'K' 
-        : num.toString();
-  };
+
 
   return (
     <div className="min-h-screen flex flex-col justify-between selection:bg-red-500/20 selection:text-red-600 dark:selection:text-red-500">
