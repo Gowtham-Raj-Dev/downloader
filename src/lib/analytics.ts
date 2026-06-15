@@ -1,5 +1,5 @@
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, increment, setDoc } from 'firebase/firestore';
+import { doc, getDoc, increment, setDoc, updateDoc } from 'firebase/firestore';
 
 export type Platform = 'instagram' | 'youtube';
 export type ActionType = 'single' | 'multi';
@@ -51,7 +51,7 @@ export const trackUserAction = async (
       updateData[`stats.${platform}.${type}.downloads`] = increment(count);
     }
 
-    await setDoc(userRef, updateData, { merge: true });
+    await updateDoc(userRef, updateData);
   } catch (error) {
     console.error("Error tracking user action:", error);
   }
