@@ -1,8 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Clipboard, ArrowRight, Sparkles, Link as LinkIcon, Plus, Trash2 } from 'lucide-react';
+import { Clipboard, ArrowRight, Sparkles, Link as LinkIcon, Plus, Trash2, Lock } from 'lucide-react';
+import { useEffect, useState as useReactState } from 'react';
+import { auth, db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+
 
 interface HeroSectionProps {
   onFetch: (inputs: string[]) => void;
@@ -11,9 +17,37 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ onFetch, isLoading, error }: HeroSectionProps) {
-  const [url, setUrl] = useState('');
-  const [activeTab, setActiveTab] = useState<'single' | 'batch'>('single');
-  const [urlFields, setUrlFields] = useState<string[]>(['', '']); // 2 empty boxes by default
+  const pathname = usePathname();
+  const isBatch = pathname?.endsWith('/multi-url');
+  const basePath = isBatch ? pathname.replace('/multi-url', '') : pathname;
+
+  const [url, setUrl] = useReactState('');
+  const [urlFields, setUrlFields] = useReactState<string[]>(['', '']); // 2 empty boxes by default
+
+  const [isPremium, setIsPremium] = useReactState(false);
+  const [isAuthLoading, setIsAuthLoading] = useReactState(true);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+
+      if (currentUser) {
+        const userRef = doc(db, 'users', currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          if (data.isPremium && data.premiumExpiry > Date.now()) {
+            setIsPremium(true);
+          } else {
+            setIsPremium(false);
+          }
+        }
+      } else {
+        setIsPremium(false);
+      }
+      setIsAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, [setIsPremium, setIsAuthLoading]);
 
   const handlePaste = async () => {
     try {
@@ -51,7 +85,7 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (activeTab === 'single') {
+    if (!isBatch) {
       const cleanUrl = url.trim();
       if (!cleanUrl) return;
       const rawInputs = cleanUrl.split(/[\s,\n]+/).filter(x => x.trim().length > 0);
@@ -63,7 +97,7 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
     }
   };
 
-  const isSubmitDisabled = activeTab === 'single'
+  const isSubmitDisabled = !isBatch
     ? !url.trim()
     : urlFields.every(field => !field.trim());
 
@@ -87,11 +121,12 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
         transition={{ duration: 0.6, delay: 0.1 }}
         className="text-4xl md:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-[1.1] mb-6"
       >
-        Explore & Download <br className="hidden sm:inline" />
+        Free{' '}
+        {isBatch ? 'Multiple ' : ''}
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange">
-          Instagram Videos
+          Instagram Video{isBatch ? 's' : ''}
         </span>{' '}
-        Instantly
+        Downloader
       </motion.h1>
 
       <motion.p
@@ -123,37 +158,31 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
       >
         {/* Modern Switcher Tabs */}
         <div className="flex border-b border-neutral-200/50 dark:border-neutral-800/30 mb-5 text-xs">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('single');
-              setUrl('');
-            }}
-            className={`flex-1 pb-3 font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${
-              activeTab === 'single'
+          <Link
+            href={basePath || '/instagram'}
+            onClick={() => setUrl('')}
+            className={`flex-1 pb-3 text-center font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${
+              !isBatch
                 ? 'border-instagram-pink text-instagram-pink'
                 : 'border-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
             }`}
           >
             Single Link
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('batch');
-              setUrl('');
-            }}
-            className={`flex-1 pb-3 font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${
-              activeTab === 'batch'
+          </Link>
+          <Link
+            href={`${basePath || '/instagram'}/multi-url`}
+            onClick={() => setUrlFields(['', ''])}
+            className={`flex-1 pb-3 text-center font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${
+              isBatch
                 ? 'border-instagram-pink text-instagram-pink'
                 : 'border-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
             }`}
           >
             Multiple Links (Batch)
-          </button>
+          </Link>
         </div>
 
-        {activeTab === 'single' ? (
+        {!isBatch ? (
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 items-center">
             <div className="relative flex-1 w-full flex items-center">
               <div className="absolute left-4 text-neutral-400">
@@ -188,6 +217,23 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
+        ) : !isAuthLoading && !isPremium ? (
+          <div className="py-8 px-4 text-center border border-indigo-200 dark:border-indigo-900/50 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20">
+            <div className="w-12 h-12 mx-auto bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-500 mb-3">
+              <Lock className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-200 mb-2">Premium Feature Locked</h3>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto mb-6">
+              Batch downloading multiple URLs at once is a premium feature. Upgrade to fetch multiple videos simultaneously with zero limits!
+            </p>
+            <Link 
+              href="/profile"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-button shadow-md transition-all cursor-pointer"
+            >
+              <span>Unlock Premium for ₹5</span>
+              <Sparkles className="w-4 h-4" />
+            </Link>
+          </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-3">

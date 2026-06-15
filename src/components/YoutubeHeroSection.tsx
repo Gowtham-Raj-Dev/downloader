@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Clipboard, ArrowRight, Sparkles, Link as LinkIcon, Plus, Trash2 } from 'lucide-react';
 
@@ -12,8 +14,11 @@ interface YoutubeHeroSectionProps {
 }
 
 export default function YoutubeHeroSection({ onFetch, isLoading, error }: YoutubeHeroSectionProps) {
+  const pathname = usePathname();
+  const isBatch = pathname?.endsWith('/multi-url');
+  const basePath = isBatch ? pathname.replace('/multi-url', '') : pathname;
+
   const [url, setUrl] = useState('');
-  const [activeTab, setActiveTab] = useState<'single' | 'batch'>('single');
   const [urlFields, setUrlFields] = useState<string[]>(['', '']); // 2 empty boxes by default
 
   const handlePaste = async () => {
@@ -52,7 +57,7 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (activeTab === 'single') {
+    if (!isBatch) {
       const cleanUrl = url.trim();
       if (!cleanUrl) return;
       const rawInputs = cleanUrl.split(/[\s,\n]+/).filter(x => x.trim().length > 0);
@@ -64,7 +69,7 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
     }
   };
 
-  const isSubmitDisabled = activeTab === 'single'
+  const isSubmitDisabled = !isBatch
     ? !url.trim()
     : urlFields.every(field => !field.trim());
 
@@ -88,11 +93,12 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
         transition={{ duration: 0.6, delay: 0.1 }}
         className="text-4xl md:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-[1.1] mb-6"
       >
-        Explore & Download <br className="hidden sm:inline" />
+        Free{' '}
+        {isBatch ? 'Multiple ' : ''}
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-600 via-rose-500 to-orange-500">
-          YouTube Videos
+          YouTube Video{isBatch ? 's' : ''}
         </span>{' '}
-        Instantly
+        Downloader
       </motion.h1>
 
       <motion.p
@@ -124,37 +130,31 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
       >
         {/* Modern Switcher Tabs */}
         <div className="flex border-b border-neutral-200/50 dark:border-neutral-800/30 mb-5 text-xs">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('single');
-              setUrl('');
-            }}
-            className={`flex-1 pb-3 font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${
-              activeTab === 'single'
+          <Link
+            href={basePath || '/youtube'}
+            onClick={() => setUrl('')}
+            className={`flex-1 pb-3 text-center font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${
+              !isBatch
                 ? 'border-red-600 text-red-600'
                 : 'border-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
             }`}
           >
             Single Link
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('batch');
-              setUrl('');
-            }}
-            className={`flex-1 pb-3 font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${
-              activeTab === 'batch'
+          </Link>
+          <Link
+            href={`${basePath || '/youtube'}/multi-url`}
+            onClick={() => setUrlFields(['', ''])}
+            className={`flex-1 pb-3 text-center font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${
+              isBatch
                 ? 'border-red-600 text-red-600'
                 : 'border-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
             }`}
           >
             Multiple Links (Batch)
-          </button>
+          </Link>
         </div>
 
-        {activeTab === 'single' ? (
+        {!isBatch ? (
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 items-center">
             <div className="relative flex-1 w-full flex items-center">
               <div className="absolute left-4 text-neutral-400">

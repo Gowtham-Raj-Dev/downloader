@@ -6,6 +6,8 @@ import {
   Sparkles, ShieldCheck, Zap, ArrowRight, Globe
 } from 'lucide-react';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import PricingTable from '@/components/PricingTable';
 
 // Custom Instagram SVG icon component
 const Instagram = (props: React.SVGProps<SVGSVGElement>) => (
@@ -137,7 +139,7 @@ export default function HomePage() {
 
             <div>
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-red-700 via-red-600 to-rose-500 text-white flex items-center justify-center shadow-lg mb-6">
-                <Youtube className="w-7 h-7 fill-white stroke-none" />
+                <Youtube className="w-7 h-7" />
               </div>
               <h3 className="text-xl md:text-2xl font-extrabold text-neutral-900 dark:text-white mb-3">
                 YouTube Downloader
@@ -197,6 +199,17 @@ export default function HomePage() {
               </p>
             </div>
           </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section className="w-full max-w-4xl mx-auto mb-24 text-center sm:text-left">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white mb-3 text-center sm:text-left">
+            Simple, Transparent Pricing
+          </h2>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-10 text-center sm:text-left">
+            Start downloading for free, or upgrade to a VIP pass for unrestricted batch features.
+          </p>
+          <PricingTable />
         </section>
 
         {/* FAQ Section */}
@@ -294,23 +307,7 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full border-t border-neutral-200/50 dark:border-neutral-800/30 py-8 px-6 bg-white/40 dark:bg-zinc-950/20 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-center md:text-left">
-            <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
-              MediaExplorer Downloader Portal
-            </span>
-            <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1 max-w-md">
-              Disclaimer: We do not store, host, or crawl copyrighted social media content. All files belong to their respective uploaders.
-            </p>
-          </div>
-          <div className="flex flex-col items-center md:items-end gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-500">
-            <span className="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono">
-              &copy; {new Date().getFullYear()} MediaExplorer Hub
-            </span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

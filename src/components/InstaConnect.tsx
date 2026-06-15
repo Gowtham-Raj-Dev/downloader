@@ -100,8 +100,11 @@ export default function InstaConnect({ onPreview, onDirectDownload }: InstaConne
   const [extractedVideo, setExtractedVideo] = useState<VideoItem | null>(null);
 
   // Copied feed feedback
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Custom alert state
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Simulated browser popups
   const openRealInstagram = () => {
@@ -149,7 +152,8 @@ export default function InstaConnect({ onPreview, onDirectDownload }: InstaConne
   const handleExtractVideo = (e: React.FormEvent) => {
     e.preventDefault();
     if (!directUrl.trim() || !isInstagramVideoUrl(directUrl)) {
-      alert('Please enter a valid Instagram video or reel URL!');
+      setErrorMsg('Please enter a valid Instagram video or reel URL!');
+      setTimeout(() => setErrorMsg(null), 3000);
       return;
     }
 
@@ -742,6 +746,20 @@ export default function InstaConnect({ onPreview, onDirectDownload }: InstaConne
                             <h3 className="text-sm font-extrabold text-neutral-800 dark:text-neutral-200">
                               Link Extractor Console
                             </h3>
+
+                            <AnimatePresence>
+                              {errorMsg && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: -5 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -5 }}
+                                  className="p-3 bg-red-500/10 border border-red-500/20 rounded-card flex items-start gap-2 text-red-600 dark:text-red-400"
+                                >
+                                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                                  <p className="text-[11px] font-medium leading-relaxed">{errorMsg}</p>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
 
                             <div className="space-y-3">
                               <div className="relative flex items-center">

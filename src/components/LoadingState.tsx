@@ -18,14 +18,12 @@ export default function LoadingState({ onComplete, count = 4, isBatch = false }:
     // Progress increment timer
     const interval = setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          if (onComplete) onComplete();
-          return 100;
+        if (prev >= 98) {
+          return 98;
         }
         // Increment faster initially, then slow down near completion
-        const increment = prev < 30 ? 6 : prev < 75 ? 4 : 2;
-        return Math.min(prev + increment, 100);
+        const increment = prev < 30 ? 6 : prev < 75 ? 4 : prev < 98 ? 1 : 0;
+        return Math.min(prev + increment, 98);
       });
     }, 100);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Play, Pause, Volume2, VolumeX, Copy, Check, Download, 
@@ -199,6 +199,7 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
                 onError={() => setVideoError(true)}
+                {...({ referrerPolicy: "no-referrer" } as React.HTMLProps<HTMLVideoElement>)}
               />
             )}
 

@@ -288,6 +288,7 @@ export default function VideoGallery({ videos, onPreview, hideFilters = false }:
                   alt={video.caption}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out select-none"
                   loading="lazy"
+                  referrerPolicy="no-referrer"
                 />
 
                 {/* Duration Tag */}
@@ -404,6 +405,7 @@ export default function VideoGallery({ videos, onPreview, hideFilters = false }:
                         src={video.thumbnail} 
                         alt="Thumbnail" 
                         className="w-full h-full object-cover" 
+                        referrerPolicy="no-referrer"
                       />
                       <span className="absolute bottom-1 right-1 bg-black/85 text-[8px] font-bold text-white px-1.5 rounded select-none">
                         {video.duration}
