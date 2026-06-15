@@ -56,7 +56,7 @@ export default function HomePage() {
       <Header />
 
       {/* Main Container */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-12 md:py-20 flex flex-col items-center">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-6 pt-12 md:pt-20 pb-8 flex flex-col items-center">
         
         {/* Welcome Section */}
         <div className="text-center max-w-3xl mx-auto mb-16">
