@@ -47,10 +47,18 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
     if (!videoRef.current) return;
     if (isPlaying) {
       videoRef.current.pause();
+      setIsPlaying(false);
     } else {
-      videoRef.current.play();
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          setIsPlaying(true);
+        }).catch(error => {
+          console.warn("Video playback prevented:", error);
+          setIsPlaying(false);
+        });
+      }
     }
-    setIsPlaying(!isPlaying);
   };
 
   const toggleMute = () => {
@@ -69,68 +77,9 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
     }
   };
 
-  const handleDownload = async () => {
-    if (isDownloading || !video) return;
-    setIsDownloading(true);
-    setDownloadProgress(0);
-
-    try {
-      const response = await fetch(video.videoUrl);
-      if (!response.ok) throw new Error('Failed to fetch video');
-
-      const reader = response.body?.getReader();
-      const contentLength = +(response.headers.get('content-length') ?? '0');
-
-      if (!reader) {
-        // Fallback for browsers not supporting stream reader
-        const blob = await response.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.setAttribute('download', `video_${videoIndex}.mp4`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
-        setIsDownloading(false);
-        return;
-      }
-
-      let receivedLength = 0;
-      const chunks: BlobPart[] = [];
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        if (value) {
-          chunks.push(value);
-          receivedLength += value.length;
-        }
-
-        if (contentLength > 0) {
-          const progress = Math.round((receivedLength / contentLength) * 100);
-          setDownloadProgress(progress);
-        }
-      }
-
-      const blob = new Blob(chunks, { type: 'video/mp4' });
-      const blobUrl = URL.createObjectURL(blob);
-
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.setAttribute('download', `video_${videoIndex}.mp4`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
-    } catch (err) {
-      console.warn('Failed to fetch video directly, falling back to new tab download:', err);
-      // Fallback: open in new tab if CORS or other network issues occur
-      window.open(video.videoUrl, '_blank');
-    } finally {
-      setIsDownloading(false);
-      setDownloadProgress(0);
-    }
+  const handleDownload = () => {
+    if (!video) return;
+    window.location.assign(video.videoUrl);
   };
 
   const formatNumber = (num: number): string => {
@@ -223,10 +172,6 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
                   {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                 </button>
               </div>
-
-              <span className="px-2 py-1 bg-black/50 text-[10px] font-mono rounded border border-zinc-800 text-neutral-400">
-                {video.duration} | MP4
-              </span>
             </div>
           </div>
 
@@ -244,10 +189,6 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
                     <Calendar className="w-3.5 h-3.5" />
                     {video.uploadDate}
                   </span>
-                  <span className="flex items-center gap-1">
-                    <Eye className="w-3.5 h-3.5" />
-                    {formatNumber(video.views)} Views
-                  </span>
                 </div>
               </div>
 
@@ -259,19 +200,6 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
                 </p>
               </div>
 
-              {/* Engagement Stats */}
-              <div className="grid grid-cols-2 gap-2 md:gap-3 pt-1 md:pt-2">
-                <div className="bg-zinc-950 border border-zinc-800 p-3 rounded-card text-center">
-                  <Heart className="w-4 h-4 text-red-500 fill-red-500/10 mx-auto mb-1" />
-                  <span className="text-[10px] font-semibold text-neutral-500 block uppercase">Likes</span>
-                  <span className="text-sm font-bold">{formatNumber(video.likes)}</span>
-                </div>
-                <div className="bg-zinc-950 border border-zinc-800 p-3 rounded-card text-center">
-                  <MessageCircle className="w-4 h-4 text-blue-500 fill-blue-500/10 mx-auto mb-1" />
-                  <span className="text-[10px] font-semibold text-neutral-500 block uppercase">Comments</span>
-                  <span className="text-sm font-bold">{formatNumber(video.comments)}</span>
-                </div>
-              </div>
 
               {/* Technical Metadata */}
               <div className="bg-zinc-950/50 border border-zinc-800/80 rounded-card p-2.5 md:p-3 space-y-1.5 md:space-y-2">

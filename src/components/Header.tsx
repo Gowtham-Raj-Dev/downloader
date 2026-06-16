@@ -65,8 +65,8 @@ export default function Header() {
   };
 
   const isHome = pathname === '/';
-  const isInstagram = pathname === '/instagram';
-  const isYoutube = pathname === '/youtube';
+  const isInstagram = pathname.startsWith('/instagram');
+  const isYoutube = pathname.startsWith('/youtube');
 
   return (
     <header className="sticky top-0 z-40 bg-white dark:bg-black border-b border-neutral-200/80 dark:border-zinc-900 px-4 md:px-8 py-4">

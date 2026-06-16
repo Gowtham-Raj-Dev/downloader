@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Clipboard, ArrowRight, Sparkles, Link as LinkIcon, Plus, Trash2 } from 'lucide-react';
+import { Clipboard, ArrowRight, Sparkles, Link as LinkIcon, Plus, Trash2, Lock } from 'lucide-react';
+import { auth, db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 
 interface YoutubeHeroSectionProps {
-  onFetch: (inputs: string[]) => void;
+  onFetch: (inputs: string[], type: 'video' | 'shorts') => void;
   isLoading: boolean;
   error?: string | null;
 }
@@ -19,7 +21,31 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
   const basePath = isBatch ? pathname.replace('/multi-url', '') : pathname;
 
   const [url, setUrl] = useState('');
-  const [urlFields, setUrlFields] = useState<string[]>(['', '']); // 2 empty boxes by default
+  const [urlFields, setUrlFields] = useState<string[]>(['', '']);
+
+  const [isPremium, setIsPremium] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+      if (currentUser) {
+        const userRef = doc(db, 'users', currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          if (data.isPremium && data.premiumExpiry > Date.now()) {
+            setIsPremium(true);
+          } else {
+            setIsPremium(false);
+          }
+        }
+      } else {
+        setIsPremium(false);
+      }
+      setIsAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, [setIsPremium, setIsAuthLoading]);
 
   const handlePaste = async () => {
     try {
@@ -61,11 +87,11 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
       const cleanUrl = url.trim();
       if (!cleanUrl) return;
       const rawInputs = cleanUrl.split(/[\s,\n]+/).filter(x => x.trim().length > 0);
-      onFetch(rawInputs);
+      onFetch(rawInputs, 'shorts');
     } else {
       const nonEmpty = urlFields.map(f => f.trim()).filter(f => f.length > 0);
       if (nonEmpty.length === 0) return;
-      onFetch(nonEmpty);
+      onFetch(nonEmpty, 'shorts');
     }
   };
 
@@ -83,7 +109,7 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-red-600/10 to-rose-500/10 border border-red-500/20 text-red-600 dark:text-red-400 mb-6"
       >
         <Sparkles className="w-3.5 h-3.5" />
-        <span>Instantly download YouTube videos, shorts & audio</span>
+        <span>Instantly download YouTube Shorts (Normal videos not supported)</span>
       </motion.div>
 
       {/* Hero Headings */}
@@ -96,7 +122,7 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
         Free{' '}
         {isBatch ? 'Multiple ' : ''}
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-600 via-rose-500 to-orange-500">
-          YouTube Video{isBatch ? 's' : ''}
+          YouTube Shorts
         </span>{' '}
         Downloader
       </motion.h1>
@@ -107,7 +133,7 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
         transition={{ duration: 0.6, delay: 0.2 }}
         className="text-base md:text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto mb-10 leading-relaxed font-normal"
       >
-        Paste any YouTube Video or Shorts link and instantly fetch, play, and download your media.
+        Paste any YouTube Shorts link and instantly fetch, play, and download your media. Note: Normal YouTube Videos are currently not supported due to server limits.
       </motion.p>
 
       {error && (
@@ -189,6 +215,23 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
+        ) : !isAuthLoading && !isPremium ? (
+          <div className="py-8 px-4 text-center border border-indigo-200 dark:border-indigo-900/50 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20">
+            <div className="w-12 h-12 mx-auto bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-500 mb-3">
+              <Lock className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-200 mb-2">Premium Feature Locked</h3>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto mb-6">
+              Batch downloading multiple URLs at once is a premium feature. Upgrade to fetch multiple videos simultaneously with zero limits!
+            </p>
+            <Link 
+              href="/profile"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-button shadow-md transition-all cursor-pointer"
+            >
+              <span>Unlock Premium for ₹10</span>
+              <Sparkles className="w-4 h-4" />
+            </Link>
+          </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-3">

@@ -168,9 +168,9 @@ export default function ProfilePage() {
     if (!user) return;
     
     // Payment verified via backend HMAC, now update Firestore locally
-    const expiryDate = Date.now() + 1 * 60 * 60 * 1000; // 1 hour pass
+    const expiryDate = Date.now() + 3 * 60 * 60 * 1000; // 3 hours pass
     const userRef = doc(db, 'users', user.uid);
-    const amountPaid = 5;
+    const amountPaid = 10;
     
     await updateDoc(userRef, {
       isPremium: true,

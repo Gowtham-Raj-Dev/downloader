@@ -313,11 +313,7 @@ export default function VideoGallery({ videos, onPreview, hideFilters = false }:
               <div className="p-4 flex-1 flex flex-col justify-between space-y-3 bg-white/40 dark:bg-zinc-950/20 backdrop-blur-sm">
                 <div className="space-y-1.5">
                   {/* Views and date */}
-                  <div className="flex items-center justify-between text-[11px] font-semibold text-neutral-400 dark:text-neutral-500">
-                    <span className="flex items-center gap-1">
-                      <Eye className="w-3.5 h-3.5" />
-                      {formatNumber(video.views)} views
-                    </span>
+                  <div className="flex items-center justify-end text-[11px] font-semibold text-neutral-400 dark:text-neutral-500">
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" />
                       {video.uploadDate}
@@ -422,10 +418,6 @@ export default function VideoGallery({ videos, onPreview, hideFilters = false }:
                       <p className="text-xs text-neutral-800 dark:text-neutral-200 font-medium leading-relaxed max-w-md line-clamp-2 select-text">
                         {video.caption}
                       </p>
-                      <div className="flex items-center gap-1.5 text-[10px] text-neutral-400">
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>{formatNumber(video.views)} views</span>
-                      </div>
                     </div>
                   </td>
 

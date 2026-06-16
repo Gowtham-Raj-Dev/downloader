@@ -230,7 +230,7 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
               href="/profile"
               className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-button shadow-md transition-all cursor-pointer"
             >
-              <span>Unlock Premium for ₹5</span>
+              <span>Unlock Premium for ₹10</span>
               <Sparkles className="w-4 h-4" />
             </Link>
           </div>

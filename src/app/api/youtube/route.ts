@@ -58,7 +58,8 @@ export async function GET(request: NextRequest) {
           },
           body: JSON.stringify({
             url: url,
-            videoQuality: quality // Selected quality format (e.g. 1080, 720, 480, 360, 240)
+            videoQuality: quality, // Selected quality format (e.g. 1080, 720, 480, 360, 240)
+            alwaysProxy: false
           }),
           signal: AbortSignal.timeout(6000) // 6 second timeout per instance
         });

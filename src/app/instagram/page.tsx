@@ -75,10 +75,18 @@ export default function InstagramPage() {
     if (!videoRef.current) return;
     if (isPlaying) {
       videoRef.current.pause();
+      setIsPlaying(false);
     } else {
-      videoRef.current.play();
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          setIsPlaying(true);
+        }).catch(error => {
+          console.warn("Video playback prevented:", error);
+          setIsPlaying(false);
+        });
+      }
     }
-    setIsPlaying(!isPlaying);
   };
 
   const handleFetchProfile = async (inputs: string[]) => {
@@ -111,7 +119,7 @@ export default function InstagramPage() {
       return;
     }
 
-    if (!isMulti && !checkDailyLimit('single')) {
+    if (!isMulti && !(await checkDailyLimit('single'))) {
       setLimitModalType(isLoggedIn ? 'free' : 'guest');
       setIsLoading(false);
       setActiveUsername(null);
@@ -184,7 +192,7 @@ export default function InstagramPage() {
         if (videoUrls.length === 1) {
           setSingleVideo(successfulVideos[0]);
           trackUserAction('instagram', 'single', 'fetch', 1);
-          incrementDailyLimit();
+          await incrementDailyLimit();
         } else {
           setFetchedVideos(successfulVideos);
           trackUserAction('instagram', 'multi', 'fetch', successfulVideos.length);
@@ -281,73 +289,10 @@ export default function InstagramPage() {
     }
   };
 
-  // Centralized download handler that supports streaming download with progress bar
-  const handleDownloadVideo = async (video: VideoItem) => {
-    if (isDownloading) return;
-    setIsDownloading(true);
-    setDownloadProgress(0);
-
-    try {
-      const response = await fetch(video.videoUrl);
-      if (!response.ok) throw new Error('Failed to fetch video');
-
-      const reader = response.body?.getReader();
-      const contentLength = +(response.headers.get('content-length') ?? '0');
-
-      if (!reader) {
-        // Fallback for browsers not supporting stream reader
-        const blob = await response.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.setAttribute('download', `video_1.mp4`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
-        setIsDownloading(false);
-        return;
-      }
-
-      let receivedLength = 0;
-      const chunks: BlobPart[] = [];
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        if (value) {
-          chunks.push(value);
-          receivedLength += value.length;
-        }
-
-        if (contentLength > 0) {
-          const progress = Math.round((receivedLength / contentLength) * 100);
-          setDownloadProgress(progress);
-        }
-      }
-
-      const blob = new Blob(chunks, { type: 'video/mp4' });
-      const blobUrl = URL.createObjectURL(blob);
-
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.setAttribute('download', `video_1.mp4`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
-      
-      const type = fetchedVideos.length > 0 ? 'multi' : 'single';
-      trackUserAction('instagram', type, 'download', 1);
-    } catch (err) {
-      console.warn('Failed to fetch video directly, falling back to new tab download:', err);
-      window.open(video.videoUrl, '_blank');
-      const type = fetchedVideos.length > 0 ? 'multi' : 'single';
-      trackUserAction('instagram', type, 'download', 1);
-    } finally {
-      setIsDownloading(false);
-      setDownloadProgress(0);
-    }
+  const handleDownloadVideo = (video: VideoItem) => {
+    window.location.assign(video.videoUrl);
+    const type = fetchedVideos.length > 0 ? 'multi' : 'single';
+    trackUserAction('instagram', type, 'download', 1);
   };
 
   const formatNumber = (num: number): string => {
@@ -503,7 +448,7 @@ export default function InstagramPage() {
                 <div className="glass-panel border border-neutral-200/60 dark:border-neutral-800/30 rounded-outer overflow-hidden shadow-2xl flex flex-col md:flex-row bg-white dark:bg-zinc-950">
 
                   {/* Left: Video Player */}
-                  <div className="relative flex-1 bg-black aspect-[4/5] flex items-center justify-center overflow-hidden max-h-[500px]">
+                  <div className={`relative flex-1 bg-black flex items-center justify-center overflow-hidden max-h-[500px] ${singleVideo.type === 'reel' ? 'aspect-[4/5]' : 'aspect-square w-full'}`}>
                     <video
                       ref={videoRef}
                       src={singleVideo.videoUrl}
@@ -525,10 +470,6 @@ export default function InstagramPage() {
                       >
                         {isPlaying ? <Pause className="w-4 h-4 fill-black" /> : <Play className="w-4 h-4 fill-black" />}
                       </button>
-
-                      <span className="px-2 py-0.5 bg-black/60 text-[10px] font-mono text-neutral-300 rounded border border-white/10 select-none">
-                        {singleVideo.duration}
-                      </span>
                     </div>
                   </div>
 

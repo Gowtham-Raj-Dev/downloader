@@ -75,10 +75,18 @@ export default function YoutubePage() {
     if (!videoRef.current) return;
     if (isPlaying) {
       videoRef.current.pause();
+      setIsPlaying(false);
     } else {
-      videoRef.current.play();
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          setIsPlaying(true);
+        }).catch(error => {
+          console.warn("Video playback prevented:", error);
+          setIsPlaying(false);
+        });
+      }
     }
-    setIsPlaying(!isPlaying);
   };
 
   const [selectedQuality, setSelectedQuality] = useState<string>('1080');
@@ -116,7 +124,7 @@ export default function YoutubePage() {
     }
   };
 
-  const handleFetchProfile = async (inputs: string[]) => {
+  const handleFetchProfile = async (inputs: string[], mediaType: 'video' | 'shorts' = 'video') => {
     if (inputs.length === 0) return;
 
     // Set loading states
@@ -130,8 +138,17 @@ export default function YoutubePage() {
     // Identify video URLs
     let videoUrls = inputs.filter(input => isYoutubeVideoUrl(input));
 
+    // STRICTLY enforce shorts only
+    const nonShortUrls = videoUrls.filter(url => !url.toLowerCase().includes('/shorts/'));
+    if (nonShortUrls.length > 0) {
+      setError('Normal YouTube Videos are not supported due to server limits. Please paste only YouTube Shorts links.');
+      setIsLoading(false);
+      setActiveUsername(null);
+      return;
+    }
+
     if (videoUrls.length === 0) {
-      setError('Invalid YouTube Video or Shorts URL. Please enter a valid YouTube link.');
+      setError('Invalid YouTube Shorts URL. Please enter a valid Shorts link.');
       setIsLoading(false);
       setActiveUsername(null);
       return;
@@ -146,7 +163,7 @@ export default function YoutubePage() {
       return;
     }
 
-    if (!isMulti && !checkDailyLimit('single')) {
+    if (!isMulti && !(await checkDailyLimit('single'))) {
       setLimitModalType(isLoggedIn ? 'free' : 'guest');
       setIsLoading(false);
       setActiveUsername(null);
@@ -168,7 +185,8 @@ export default function YoutubePage() {
           await new Promise(r => setTimeout(r, 1500 * (index - 199)));
         }
 
-        const response = await fetch(`/api/youtube?url=${encodeURIComponent(url)}&quality=1080`);
+        const defaultQuality = mediaType === 'video' ? '720' : '1080';
+        const response = await fetch(`/api/youtube?url=${encodeURIComponent(url)}&quality=${defaultQuality}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch YouTube link: ${url}`);
         }
@@ -194,14 +212,13 @@ export default function YoutubePage() {
           id: `${videoId}_${randomStr}`,
           thumbnail: data.thumbnail,
           videoUrl: data.videoUrl,
-          duration: '0:35', // estimated or default
           uploadDate: 'Just now',
           views,
           likes,
           comments: 0,
           caption: `${data.title} - Shared by ${data.author}.`,
-          type: url.toLowerCase().includes('/shorts/') ? 'reel' : 'video',
-          instagramUrl: url, // to maintain compatibility with original layouts/components
+          type: mediaType === 'shorts' ? 'reel' : 'video',
+          instagramUrl: url,
           youtubeUrl: url,
           title: data.title,
           author: data.author
@@ -225,7 +242,7 @@ export default function YoutubePage() {
         if (videoUrls.length === 1) {
           setSingleVideo(successfulVideos[0]);
           trackUserAction('youtube', 'single', 'fetch', 1);
-          incrementDailyLimit();
+          await incrementDailyLimit();
         } else {
           setFetchedVideos(successfulVideos);
           trackUserAction('youtube', 'multi', 'fetch', successfulVideos.length);
@@ -324,76 +341,33 @@ export default function YoutubePage() {
     }
   };
 
-  // Centralized download handler that supports streaming download with progress bar
-  const handleDownloadVideo = async (video: YoutubeVideoItem) => {
-    if (isDownloading) return;
+  // Direct download that fetches quality and opens URL to prevent 0B blob issues
+  const handleDirectDownload = async (quality: string) => {
+    if (!singleVideo) return;
     setIsDownloading(true);
-    setDownloadProgress(0);
-
+    setDownloadProgress(50); // visual indicator
     try {
-      const response = await fetch(video.videoUrl);
-      if (!response.ok) throw new Error('Failed to fetch video');
-
-      const reader = response.body?.getReader();
-      const contentLength = +(response.headers.get('content-length') ?? '0');
-
-      const cleanTitle = (video.title || 'youtube_video').replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      const filename = `${cleanTitle}.mp4`;
-
-      if (!reader) {
-        // Fallback for browsers not supporting stream reader
-        const blob = await response.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.setAttribute('download', filename);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
-        setIsDownloading(false);
-        return;
+      const response = await fetch(`/api/youtube?url=${encodeURIComponent(singleVideo.youtubeUrl)}&quality=${quality}`);
+      const result = await response.json();
+      if (result.success && result.data?.videoUrl) {
+         window.location.assign(result.data.videoUrl);
+         trackUserAction('youtube', 'single', 'download', 1);
+      } else {
+         alert('Failed to extract ' + quality + 'p video.');
       }
-
-      let receivedLength = 0;
-      const chunks: BlobPart[] = [];
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        if (value) {
-          chunks.push(value);
-          receivedLength += value.length;
-        }
-
-        if (contentLength > 0) {
-          const progress = Math.round((receivedLength / contentLength) * 100);
-          setDownloadProgress(progress);
-        }
-      }
-
-      const blob = new Blob(chunks, { type: 'video/mp4' });
-      const blobUrl = URL.createObjectURL(blob);
-
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
-
-      const type = fetchedVideos.length > 0 ? 'multi' : 'single';
-      trackUserAction('youtube', type, 'download', 1);
     } catch (err) {
-      console.warn('Failed to fetch video directly, falling back to open video tab:', err);
-      window.open(video.videoUrl, '_blank');
-      const type = fetchedVideos.length > 0 ? 'multi' : 'single';
-      trackUserAction('youtube', type, 'download', 1);
+      console.error(err);
+      alert('Error fetching video quality.');
     } finally {
       setIsDownloading(false);
       setDownloadProgress(0);
     }
+  };
+
+  const handleDownloadVideo = (video: YoutubeVideoItem) => {
+    window.location.assign(video.videoUrl);
+    const type = fetchedVideos.length > 0 ? 'multi' : 'single';
+    trackUserAction('youtube', type, 'download', 1);
   };
 
 
@@ -543,7 +517,7 @@ export default function YoutubePage() {
                 <div className="glass-panel border border-neutral-200/60 dark:border-neutral-800/30 rounded-outer overflow-hidden shadow-2xl flex flex-col md:flex-row bg-white dark:bg-zinc-950">
 
                   {/* Left: Video Player */}
-                  <div className="relative flex-1 bg-black aspect-[16/10] flex items-center justify-center overflow-hidden max-h-[500px]">
+                  <div className={`relative flex-1 bg-black flex items-center justify-center overflow-hidden max-h-[500px] ${singleVideo.type === 'reel' ? 'aspect-[4/5]' : 'aspect-video w-full'}`}>
                     <video
                       ref={videoRef}
                       src={singleVideo.videoUrl}
@@ -565,10 +539,6 @@ export default function YoutubePage() {
                       >
                         {isPlaying ? <Pause className="w-4 h-4 fill-black" /> : <Play className="w-4 h-4 fill-black" />}
                       </button>
-
-                      <span className="px-2 py-0.5 bg-black/60 text-[10px] font-mono text-neutral-300 rounded border border-white/10 select-none">
-                        {singleVideo.duration}
-                      </span>
                     </div>
                   </div>
 
@@ -609,31 +579,7 @@ export default function YoutubePage() {
                         </div>
                       )}
 
-                      {/* Quality Selection Dropdown */}
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
-                          Select Quality
-                        </span>
-                        <div className="relative">
-                          <select
-                            value={selectedQuality}
-                            onChange={(e) => handleQualityChange(e.target.value)}
-                            disabled={isChangingQuality || isDownloading}
-                            className="w-full text-xs py-2.5 px-3 rounded-button bg-white dark:bg-zinc-950 text-neutral-800 dark:text-neutral-200 border border-neutral-200/60 dark:border-neutral-800/60 focus:outline-none focus:border-red-500 transition-colors disabled:opacity-50 cursor-pointer"
-                          >
-                            <option value="1080">1080p (Best Quality)</option>
-                            <option value="720">720p (High Quality)</option>
-                            <option value="480">480p (Medium Quality)</option>
-                            <option value="360">360p (Low Quality)</option>
-                            <option value="240">240p (Mobile Quality)</option>
-                          </select>
-                          {isChangingQuality && (
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
-                              <span className="w-3.5 h-3.5 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+
                     </div>
 
                     {/* Download section */}
@@ -666,33 +612,40 @@ export default function YoutubePage() {
                         </a>
                       </div>
 
-                      <button
-                        onClick={() => handleDownloadVideo(singleVideo)}
-                        disabled={isDownloading || isChangingQuality}
-                        className="w-full relative overflow-hidden py-3 rounded-button bg-gradient-to-r from-red-600 via-rose-500 to-orange-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:brightness-105 transition-all disabled:opacity-95"
-                      >
-                        {isDownloading ? (
-                          <>
-                            <motion.div
-                              className="absolute inset-0 bg-white/20"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${downloadProgress}%` }}
-                              transition={{ duration: 0.1 }}
-                            />
-                            <span className="relative z-10">Downloading {downloadProgress}%...</span>
-                          </>
-                        ) : isChangingQuality ? (
-                          <>
-                            <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                            <span>Updating Quality...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Download className="w-4 h-4" />
-                            <span>Download MP4 ({selectedQuality}p)</span>
-                          </>
-                        )}
-                      </button>
+                      <div className="grid grid-cols-2 gap-2 mt-4">
+                        <button
+                          onClick={() => handleDirectDownload('1080')}
+                          disabled={isDownloading}
+                          className="w-full py-2.5 rounded-button bg-gradient-to-r from-red-600 to-rose-500 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:brightness-105 transition-all disabled:opacity-50"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>1080p MP4</span>
+                        </button>
+                        <button
+                          onClick={() => handleDirectDownload('720')}
+                          disabled={isDownloading}
+                          className="w-full py-2.5 rounded-button bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:brightness-105 transition-all disabled:opacity-50"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>720p MP4</span>
+                        </button>
+                        <button
+                          onClick={() => handleDirectDownload('480')}
+                          disabled={isDownloading}
+                          className="w-full py-2.5 rounded-button bg-neutral-800 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:bg-neutral-700 transition-all disabled:opacity-50"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>480p MP4</span>
+                        </button>
+                        <button
+                          onClick={() => handleDirectDownload('360')}
+                          disabled={isDownloading}
+                          className="w-full py-2.5 rounded-button bg-neutral-800 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:bg-neutral-700 transition-all disabled:opacity-50"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>360p MP4</span>
+                        </button>
+                      </div>
                     </div>
 
                   </div>

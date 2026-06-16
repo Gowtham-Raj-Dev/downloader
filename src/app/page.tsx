@@ -52,8 +52,52 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col justify-between selection:bg-rose-500/20 selection:text-rose-600 dark:selection:text-rose-400">
       
-      {/* Header component */}
       <Header />
+
+      {/* FAQ Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Do I need to pay or create an account?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No, our downloader is completely free and requires no registration. You do not need to provide passwords, credit cards, or register any social credentials to download media."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Are there limits on how many videos I can download?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "None. You can download as many public videos, Reels, and YouTube clips as you like. We support unlimited downloads with full speed rendering."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I download private Instagram posts or members-only videos?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No, this tool respects content creators' privacy and security boundaries. MediaExplorer is designed to download publicly available media only."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does it support batch downloads?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes! Both our Instagram and YouTube downloaders feature a dedicated Multiple Links (Batch) mode."
+                }
+              }
+            ]
+          })
+        }}
+      />
 
       {/* Main Container */}
       <main className="flex-1 w-full max-w-6xl mx-auto px-6 pt-12 md:pt-20 pb-8 flex flex-col items-center">
