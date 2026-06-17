@@ -121,7 +121,7 @@ export default function HomePage() {
             className="text-4xl md:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-[1.1] mb-6"
           >
             Download High Quality <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-600 via-pink-500 to-orange-500">
+            <span className="shine-home">
               Social Media Videos
             </span>
           </motion.h1>

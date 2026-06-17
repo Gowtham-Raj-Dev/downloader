@@ -66,6 +66,9 @@ export const metadata: Metadata = {
   verification: {
     google: "add-your-google-site-verification-here", // User can replace this later
   },
+  icons: {
+    icon: '/icon.png',
+  },
 };
 
 const jsonLd = {

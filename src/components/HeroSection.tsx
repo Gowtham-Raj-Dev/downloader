@@ -123,7 +123,7 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
       >
         Free{' '}
         {isBatch ? 'Multiple ' : ''}
-        <span className="bg-clip-text text-transparent bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange">
+        <span className="shine-insta">
           Instagram Video{isBatch ? 's' : ''}
         </span>{' '}
         Downloader
@@ -217,7 +217,12 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
-        ) : !isAuthLoading && !isPremium ? (
+        ) : isAuthLoading ? (
+          <div className="py-12 flex flex-col items-center justify-center gap-3">
+            <div className="w-8 h-8 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+            <span className="text-xs font-semibold text-neutral-500 animate-pulse uppercase tracking-wider">Checking Premium Status...</span>
+          </div>
+        ) : !isPremium ? (
           <div className="py-8 px-4 text-center border border-indigo-200 dark:border-indigo-900/50 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20">
             <div className="w-12 h-12 mx-auto bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-500 mb-3">
               <Lock className="w-6 h-6" />

@@ -138,3 +138,63 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
 }
+
+/* --- Premium Shining Text Effects --- */
+@keyframes shiny-text {
+  0% { background-position: 200% center; }
+  100% { background-position: 0% center; }
+}
+
+.shine-home {
+  background: linear-gradient(
+    to right,
+    #e11d48 0%,    
+    #f97316 20%,   
+    #e11d48 40%,   
+    #ffffff 50%,   
+    #e11d48 60%,   
+    #f97316 80%,   
+    #e11d48 100%   
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shiny-text 4s linear infinite;
+}
+
+.shine-insta {
+  background: linear-gradient(
+    to right,
+    #833ab4 0%,    
+    #e1306c 20%,   
+    #833ab4 40%,   
+    #ffffff 50%,   
+    #833ab4 60%,   
+    #e1306c 80%,   
+    #833ab4 100%   
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shiny-text 4s linear infinite;
+}
+
+.shine-youtube {
+  background: linear-gradient(
+    to right,
+    #dc2626 0%,    
+    #f97316 20%,   
+    #dc2626 40%,   
+    #ffffff 50%,   
+    #dc2626 60%,   
+    #f97316 80%,   
+    #dc2626 100%   
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shiny-text 4s linear infinite;
+}
