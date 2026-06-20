@@ -9,7 +9,11 @@ export const metadata: Metadata = {
     "multiple instagram video download",
     "download multiple instagram videos",
     "batch instagram video download",
-    "bulk instagram downloader free"
+    "bulk instagram downloader free",
+    "insta downloader",
+    "insta downloader free",
+    "instagram downloader",
+    "insta video downloader"
   ],
   openGraph: {
     title: "Free Multiple Instagram Video Downloader - Download Reels",

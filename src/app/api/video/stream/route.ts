@@ -38,6 +38,13 @@ export async function GET(request: NextRequest) {
     headers.set('Accept-Ranges', 'bytes');
     headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
 
+    const isDownload = searchParams.get('download') === '1';
+    const filename = searchParams.get('filename') || 'video.mp4';
+    
+    if (isDownload) {
+      headers.set('Content-Disposition', `attachment; filename="${filename}"`);
+    }
+
     return new NextResponse(response.body, {
       status: 200,
       headers,

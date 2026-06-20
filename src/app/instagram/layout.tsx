@@ -1,22 +1,28 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Insta Downloader Free - Batch & Multi-URL Instagram Loader",
-  description: "Download high-quality Instagram videos, Reels, and photos for free. Best multi-URL Insta downloader tool online. Download multiple videos at once in bulk.",
+  title: "Insta Downloader - Free Instagram Video & Reels Downloader",
+  description: "Best Insta Downloader to download high-quality Instagram videos, Reels, and photos for free. Download single or multiple Instagram videos (batch & multi-URL) instantly.",
   keywords: [
-    "Insta downloader free",
     "insta downloader",
-    "instagram lodader",
-    "free insta videos download",
+    "insta downloader free",
+    "instagram downloader",
+    "insta video downloader",
     "instagram reels downloader",
+    "ig downloader",
     "ig video downloader",
+    "instagram video download",
+    "download instagram reels",
+    "free insta videos download",
     "multi url instagram downloader",
     "bulk instagram downloader",
-    "download multiple instagram videos"
+    "download multiple instagram videos",
+    "insta reels downloader",
+    "instagram photo downloader"
   ],
   openGraph: {
-    title: "Insta Downloader Free - Batch & Multi-URL Instagram Loader",
-    description: "Download high-quality Instagram videos, Reels, and photos for free. Best multi-URL Insta downloader tool online.",
+    title: "Insta Downloader - Free Instagram Video & Reels Downloader",
+    description: "Best Insta Downloader to download high-quality Instagram videos, Reels, and photos for free. Download single or multiple Instagram videos (batch & multi-URL) instantly.",
     url: "https://downloader.codelove.in/instagram",
   },
   alternates: {
@@ -27,9 +33,9 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "Insta Downloader Free",
+  "name": "Insta Downloader",
   "url": "https://downloader.codelove.in/instagram",
-  "description": "Download high-quality Instagram videos, Reels, and photos for free.",
+  "description": "Best Insta Downloader to download high-quality Instagram videos, Reels, and photos for free.",
   "applicationCategory": "MultimediaApplication",
   "operatingSystem": "All",
   "offers": {

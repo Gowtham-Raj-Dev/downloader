@@ -4,6 +4,8 @@ export interface YoutubeVideoItem extends VideoItem {
   youtubeUrl: string;
   title?: string;
   author?: string;
+  sizeMb?: number;
+  exactDuration?: string;
 }
 
 export function isYoutubeVideoUrl(input: string): boolean {

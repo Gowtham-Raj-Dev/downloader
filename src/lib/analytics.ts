@@ -1,7 +1,7 @@
 import { auth, db } from '@/lib/firebase';
 import { doc, getDoc, increment, setDoc, updateDoc } from 'firebase/firestore';
 
-export type Platform = 'instagram' | 'youtube';
+export type Platform = 'instagram' | 'youtube' | 'pinterest';
 export type ActionType = 'single' | 'multi';
 export type Action = 'fetch' | 'download';
 
@@ -34,6 +34,10 @@ export const trackUserAction = async (
             multi: { fetches: 0, downloads: 0 }
           },
           youtube: {
+            single: { fetches: 0, downloads: 0 },
+            multi: { fetches: 0, downloads: 0 }
+          },
+          pinterest: {
             single: { fetches: 0, downloads: 0 },
             multi: { fetches: 0, downloads: 0 }
           }

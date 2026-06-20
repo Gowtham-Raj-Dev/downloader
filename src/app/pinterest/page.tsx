@@ -15,34 +15,28 @@ import LimitExceededModal from '@/components/LimitExceededModal';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import {
-  isInstagramVideoUrl,
+  isPinterestVideoUrl,
   extractVideoShortcode,
   VideoItem
 } from '@/data/mockProfiles';
 import { trackUserAction } from '@/lib/analytics';
 import { useUserLimits } from '@/lib/useUserLimits';
 
-// Custom Instagram SVG icon component
-const Instagram = (props: React.SVGProps<SVGSVGElement>) => (
+// Custom Pinterest SVG icon component
+const Pinterest = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
     height="24"
     viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
+    fill="currentColor"
     {...props}
   >
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.367 18.592 0 12.017 0z"/>
   </svg>
 );
 
-export default function InstagramPage() {
+export default function PinterestPage() {
   const { isLoggedIn, isPremium, checkDailyLimit, incrementDailyLimit } = useUserLimits();
   const [activeUsername, setActiveUsername] = useState<string | null>(null);
   const [singleVideo, setSingleVideo] = useState<VideoItem | null>(null);
@@ -101,10 +95,10 @@ export default function InstagramPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Identify video URLs
-    let videoUrls = inputs.filter(input => isInstagramVideoUrl(input));
+    let videoUrls = inputs.filter(input => isPinterestVideoUrl(input));
 
     if (videoUrls.length === 0) {
-      setError('Invalid Instagram Video or Reel URL. Please enter a valid Instagram video link.');
+      setError('Invalid Pinterest Video or Reel URL. Please enter a valid Pinterest video link.');
       setIsLoading(false);
       setActiveUsername(null);
       return;
@@ -142,7 +136,7 @@ export default function InstagramPage() {
           await new Promise(r => setTimeout(r, 1500 * (index - 199))); 
         }
 
-        const response = await fetch(`/api/video?url=${encodeURIComponent(url)}`);
+        const response = await fetch(`/api/pinterest?url=${encodeURIComponent(url)}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${url}`);
         }
@@ -156,9 +150,7 @@ export default function InstagramPage() {
 
         const shortcode = extractVideoShortcode(url) || 'video';
         const randomId = Math.random().toString(36).substring(2, 9);
-        const proxiedThumbnail = media.thumbnail
-          ? `/api/video/stream?url=${encodeURIComponent(media.thumbnail)}`
-          : '';
+        const proxiedThumbnail = media.thumbnail || '';
 
         return {
           id: `${shortcode}_${randomId}`,
@@ -170,7 +162,7 @@ export default function InstagramPage() {
           comments: 0,
           caption: postInfo.caption || '',
           type: 'video',
-          instagramUrl: url,
+          pinterestUrl: url,
           uploadDate: 'Just now'
         } as VideoItem;
       });
@@ -191,18 +183,18 @@ export default function InstagramPage() {
       if (successfulVideos.length > 0) {
         if (videoUrls.length === 1) {
           setSingleVideo(successfulVideos[0]);
-          trackUserAction('instagram', 'single', 'fetch', 1);
+          trackUserAction('pinterest', 'single', 'fetch', 1);
           await incrementDailyLimit();
         } else {
           setFetchedVideos(successfulVideos);
-          trackUserAction('instagram', 'multi', 'fetch', successfulVideos.length);
+          trackUserAction('pinterest', 'multi', 'fetch', successfulVideos.length);
         }
 
         if (failedUrls.length > 0) {
           setError(`Successfully fetched ${successfulVideos.length} video(s). Failed to fetch ${failedUrls.length} link(s).`);
         }
       } else {
-        setError('Failed to fetch any of the provided Instagram video URLs. Please check the links.');
+        setError('Failed to fetch any of the provided Pinterest video URLs. Please check the links.');
         setActiveUsername(null);
       }
     } catch (err) {
@@ -228,10 +220,10 @@ export default function InstagramPage() {
     for (let i = 0; i < videosToDownload.length; i++) {
       const video = videosToDownload[i];
       try {
-        const proxyUrl = `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}&download=1&filename=instagram_video_${i + 1}.mp4`;
+        const proxyUrl = `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}&download=1&filename=pinterest_video_${i + 1}.mp4`;
         const link = document.createElement('a');
         link.href = proxyUrl;
-        link.download = `instagram_video_${i + 1}.mp4`;
+        link.download = `pinterest_video_${i + 1}.mp4`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -248,10 +240,9 @@ export default function InstagramPage() {
     }
 
     setIsZipping(false);
-    setIsDownloadAllModalOpen(false);
     setZipProgress(0);
     if (completedCount > 0) {
-      trackUserAction('instagram', 'multi', 'download', completedCount);
+      trackUserAction('pinterest', 'multi', 'download', completedCount);
     }
   };
 
@@ -277,7 +268,7 @@ export default function InstagramPage() {
   const handleCopySingleLink = async () => {
     if (!singleVideo) return;
     try {
-      await navigator.clipboard.writeText(singleVideo.instagramUrl || "");
+      await navigator.clipboard.writeText(singleVideo.pinterestUrl || '');
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
@@ -285,18 +276,18 @@ export default function InstagramPage() {
     }
   };
 
-  const handleDownloadVideo = (video: VideoItem) => {
+  const handleDownloadVideo = async (video: VideoItem) => {
     try {
-      const proxyUrl = `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}&download=1&filename=instagram_video_${video.id}.mp4`;
+      const proxyUrl = `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}&download=1&filename=pinterest_video_${video.id}.mp4`;
       const link = document.createElement('a');
       link.href = proxyUrl;
-      link.download = `instagram_video_${video.id}.mp4`;
+      link.download = `pinterest_video_${video.id}.mp4`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
       const type = fetchedVideos.length > 0 ? 'multi' : 'single';
-      trackUserAction('instagram', type, 'download', 1);
+      trackUserAction('pinterest', type, 'download', 1);
     } catch (err) {
       console.error('Download failed:', err);
       window.open(video.videoUrl, '_blank');
@@ -312,7 +303,7 @@ export default function InstagramPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between selection:bg-instagram-pink/20 selection:text-instagram-pink dark:selection:text-instagram-orange">
+    <div className="min-h-screen flex flex-col justify-between selection:bg-[#E60023]/20 selection:text-[#E60023] dark:selection:text-red-600">
 
       {/* Unified Header */}
       <Header />
@@ -338,17 +329,17 @@ export default function InstagramPage() {
                 {/* Feature Highlights */}
                 <div className="max-w-4xl mx-auto px-4 mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="glass-card p-5 rounded-card border border-neutral-200/40 dark:border-neutral-800/20 text-center">
-                    <div className="w-10 h-10 rounded-full bg-instagram-purple/10 text-instagram-purple flex items-center justify-center mx-auto mb-3">
+                    <div className="w-10 h-10 rounded-full bg-red-700/10 text-red-700 flex items-center justify-center mx-auto mb-3">
                       <ShieldCheck className="w-5 h-5" />
                     </div>
                     <h4 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-1">No Login Required</h4>
                     <p className="text-xs text-neutral-500 dark:text-neutral-500 leading-relaxed">
-                      Extract and download public Instagram videos instantly without needing passwords or authorization.
+                      Extract and download public Pinterest videos instantly without needing passwords or authorization.
                     </p>
                   </div>
 
                   <div className="glass-card p-5 rounded-card border border-neutral-200/40 dark:border-neutral-800/20 text-center">
-                    <div className="w-10 h-10 rounded-full bg-instagram-pink/10 text-instagram-pink flex items-center justify-center mx-auto mb-3">
+                    <div className="w-10 h-10 rounded-full bg-[#E60023]/10 text-[#E60023] flex items-center justify-center mx-auto mb-3">
                       <Sparkles className="w-5 h-5" />
                     </div>
                     <h4 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-1">Single Video Extractor</h4>
@@ -358,8 +349,8 @@ export default function InstagramPage() {
                   </div>
 
                   <div className="glass-card p-5 rounded-card border border-neutral-200/40 dark:border-neutral-800/20 text-center">
-                    <div className="w-10 h-10 rounded-full bg-instagram-orange/10 text-instagram-orange flex items-center justify-center mx-auto mb-3">
-                      <Instagram className="w-5 h-5" />
+                    <div className="w-10 h-10 rounded-full bg-red-600/10 text-red-600 flex items-center justify-center mx-auto mb-3">
+                      <Pinterest className="w-5 h-5" />
                     </div>
                     <h4 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-1">Multiple Links Extractor</h4>
                     <p className="text-xs text-neutral-500 dark:text-neutral-500 leading-relaxed">
@@ -411,7 +402,7 @@ export default function InstagramPage() {
                       }
                     }}
                     disabled={isZipping}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange text-white font-bold text-xs rounded-button shadow-lg hover:brightness-105 active:scale-[0.98] transition-all disabled:opacity-80 cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-700 via-[#E60023] to-red-600 text-white font-bold text-xs rounded-button shadow-lg hover:brightness-105 active:scale-[0.98] transition-all disabled:opacity-80 cursor-pointer"
                   >
                     <Download className="w-4 h-4" />
                     <span>{isZipping ? `Downloading ${zipProgress}%...` : 'Download All (Direct)'}</span>
@@ -421,7 +412,7 @@ export default function InstagramPage() {
                 {/* Header Summary Card */}
                 <div className="glass-panel w-full max-w-6xl mx-auto p-6 rounded-outer mb-8 border border-neutral-200/50 dark:border-neutral-800/30 flex flex-col sm:flex-row items-center justify-between gap-6 bg-white dark:bg-zinc-950">
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-instagram-purple via-instagram-pink to-instagram-orange flex items-center justify-center text-white shadow-lg shrink-0">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-red-700 via-[#E60023] to-red-600 flex items-center justify-center text-white shadow-lg shrink-0">
                       <Archive className="w-7 h-7" />
                     </div>
                     <div className="text-left">
@@ -429,7 +420,7 @@ export default function InstagramPage() {
                         Multiple Video Manager
                       </h2>
                       <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-                        Successfully fetched {fetchedVideos.length} Instagram videos. Click <span className="font-bold text-instagram-orange">Download All</span> to automatically save all videos to your device.
+                        Successfully fetched {fetchedVideos.length} Pinterest videos. Click <span className="font-bold text-red-600">Download All</span> to automatically save all videos to your device.
                       </p>
                     </div>
                   </div>
@@ -512,20 +503,7 @@ export default function InstagramPage() {
                         </p>
                       </div>
 
-                      {/* Engagement stats */}
-                      <div className="grid grid-cols-2 gap-2.5">
-                        <div className="bg-white dark:bg-zinc-950 p-2.5 rounded-card border border-neutral-200/40 dark:border-neutral-800/60 text-center">
-                          <Eye className="w-3.5 h-3.5 text-instagram-pink mx-auto mb-1" />
-                          <span className="text-[9px] text-neutral-400 block uppercase font-bold">Views</span>
-                          <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">{formatNumber(singleVideo.views)}</span>
-                        </div>
-
-                        <div className="bg-white dark:bg-zinc-950 p-2.5 rounded-card border border-neutral-200/40 dark:border-neutral-800/60 text-center">
-                          <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500/10 mx-auto mb-1" />
-                          <span className="text-[9px] text-neutral-400 block uppercase font-bold">Likes</span>
-                          <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">{formatNumber(singleVideo.likes)}</span>
-                        </div>
-                      </div>
+                      {/* Engagement stats removed per user request */}
                     </div>
 
                     {/* Download section */}
@@ -549,7 +527,7 @@ export default function InstagramPage() {
                         </button>
 
                         <a
-                          href={singleVideo.instagramUrl}
+                          href={singleVideo.pinterestUrl || '#'}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="py-2.5 px-3 rounded-button bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200/40 dark:border-neutral-800/60 transition-colors flex items-center justify-center cursor-pointer"
@@ -561,7 +539,7 @@ export default function InstagramPage() {
                       <button
                         onClick={() => handleDownloadVideo(singleVideo)}
                         disabled={isDownloading}
-                        className="w-full relative overflow-hidden py-3 rounded-button bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:brightness-105 transition-all disabled:opacity-95"
+                        className="w-full relative overflow-hidden py-3 rounded-button bg-gradient-to-r from-red-700 via-[#E60023] to-red-600 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:brightness-105 transition-all disabled:opacity-95"
                       >
                         {isDownloading ? (
                           <>

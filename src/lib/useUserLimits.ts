@@ -37,10 +37,10 @@ export function useUserLimits() {
 
   const checkDailyLimit = async (type: 'single' | 'multi') => {
     if (isPremium) return true; // Premium has no hard limits
-    
+
     // For Multi, if not premium, they can't use it
-    if (type === 'multi') return false; 
-    
+    if (type === 'multi') return false;
+
     try {
       const res = await fetch('/api/limits', {
         method: 'POST',
@@ -59,9 +59,9 @@ export function useUserLimits() {
     const today = new Date().toISOString().split('T')[0];
     const key = `daily_downloads_${today}`;
     const count = parseInt(localStorage.getItem(key) || '0');
-    
+
     const limit = isLoggedIn ? 100 : 20;
-    
+
     return count < limit;
   };
 

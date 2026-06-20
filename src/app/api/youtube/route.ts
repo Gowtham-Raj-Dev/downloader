@@ -43,6 +43,28 @@ export async function GET(request: NextRequest) {
       console.warn('Failed to fetch oEmbed metadata:', metaErr);
     }
 
+    let exactDuration = null;
+    let exactSizeMb = 0;
+    try {
+      const ytRes = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }, signal: AbortSignal.timeout(4000) });
+      if (ytRes.ok) {
+        const html = await ytRes.text();
+        const dm = html.match(new RegExp('approxDurationMs.:.(\\d+)'));
+        if (dm && dm[1]) {
+           const durationSec = Math.round(parseInt(dm[1]) / 1000);
+           const m = Math.floor(durationSec / 60);
+           const s = durationSec % 60;
+           exactDuration = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+        const smMatches = [...html.matchAll(new RegExp('contentLength.:.(\\d+)', 'g'))].map(m => parseInt(m[1]));
+        if (smMatches.length > 0) {
+           exactSizeMb = Math.max(...smMatches) / (1024 * 1024);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to extract exact stats from YT source:', e);
+    }
+
     // 2. Fetch direct download link from Cobalt instances
     let downloadUrl = null;
     const errorMsg = 'Failed to extract download link from all Cobalt instances.';
@@ -91,7 +113,9 @@ export async function GET(request: NextRequest) {
         title: metadata.title,
         author: metadata.author,
         thumbnail: metadata.thumbnail,
-        videoUrl: downloadUrl
+        videoUrl: downloadUrl,
+        sizeMb: exactSizeMb || null,
+        exactDuration: exactDuration
       }
     });
 

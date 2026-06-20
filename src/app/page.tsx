@@ -48,6 +48,40 @@ const Youtube = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+const Pinterest = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    {...props}
+  >
+    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.367 18.592 0 12.017 0z"/>
+  </svg>
+);
+
+const FileText = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+    <polyline points="14 2 14 8 20 8" />
+    <line x1="16" y1="13" x2="8" y2="13" />
+    <line x1="16" y1="17" x2="8" y2="17" />
+    <line x1="10" y1="9" x2="8" y2="9" />
+  </svg>
+);
+
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col justify-between selection:bg-rose-500/20 selection:text-rose-600 dark:selection:text-rose-400">
@@ -201,10 +235,72 @@ export default function HomePage() {
             </Link>
           </motion.div>
 
+          {/* Pinterest Downloader Card */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            whileHover={{ y: -6, scale: 1.01 }}
+            className="relative group glass-panel bg-white dark:bg-zinc-950 border border-neutral-200/60 dark:border-zinc-800/80 p-8 rounded-outer shadow-premium dark:shadow-premium-dark overflow-hidden flex flex-col justify-between"
+          >
+            {/* Background Glow */}
+            <div className="absolute -right-20 -top-20 w-44 h-44 bg-gradient-to-br from-red-600 to-red-900 opacity-10 blur-2xl rounded-full group-hover:opacity-20 transition-all duration-500" />
+            
+            <div>
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-red-700 via-[#E60023] to-red-600 text-white flex items-center justify-center shadow-lg mb-6">
+                <Pinterest className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-extrabold text-neutral-900 dark:text-white mb-3">
+                Pinterest Downloader
+              </h3>
+              <p className="text-sm text-neutral-500 dark:text-zinc-400 leading-relaxed mb-8">
+                Instantly fetch and download public Pinterest videos and media in full quality. Batch extraction supported.
+              </p>
+            </div>
+
+            <Link href="/pinterest" className="w-full">
+              <button className="w-full py-3.5 bg-gradient-to-r from-red-700 via-[#E60023] to-red-600 hover:brightness-105 active:scale-[0.98] transition-all text-white font-bold text-sm rounded-button flex items-center justify-center gap-2 cursor-pointer shadow-md">
+                <span>Open Pinterest Downloader</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </Link>
+          </motion.div>
+
+          {/* YouTube Description Extractor Card */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            whileHover={{ y: -6, scale: 1.01 }}
+            className="relative group glass-panel bg-white dark:bg-zinc-950 border border-neutral-200/60 dark:border-zinc-800/80 p-8 rounded-outer shadow-premium dark:shadow-premium-dark overflow-hidden flex flex-col justify-between"
+          >
+            {/* Background Glow */}
+            <div className="absolute -right-20 -top-20 w-44 h-44 bg-gradient-to-br from-blue-600 to-indigo-500 opacity-10 blur-2xl rounded-full group-hover:opacity-20 transition-all duration-500" />
+
+            <div>
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 via-blue-500 to-indigo-500 text-white flex items-center justify-center shadow-lg mb-6">
+                <FileText className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-extrabold text-neutral-900 dark:text-white mb-3">
+                YT Description Extractor
+              </h3>
+              <p className="text-sm text-neutral-500 dark:text-zinc-400 leading-relaxed mb-8">
+                Easily extract and copy descriptions and tags from YouTube Shorts and Videos to reuse in your own content workflow.
+              </p>
+            </div>
+
+            <Link href="/youtube/description-extractor" className="w-full">
+              <button className="w-full py-3.5 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 hover:brightness-105 active:scale-[0.98] transition-all text-white font-bold text-sm rounded-button flex items-center justify-center gap-2 cursor-pointer shadow-md">
+                <span>Open Description Extractor</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </Link>
+          </motion.div>
+
         </div>
 
         {/* How it Works Section */}
-        <section className="w-full max-w-4xl mx-auto mb-24 text-left">
+        <section id="how-it-works" className="w-full max-w-4xl mx-auto mb-24 text-left">
           <h2 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white mb-3 text-center sm:text-left">
             How to Download Media
           </h2>
@@ -246,7 +342,7 @@ export default function HomePage() {
         </section>
 
         {/* Pricing Section */}
-        <section className="w-full max-w-4xl mx-auto mb-24 text-center sm:text-left">
+        <section id="pricing" className="w-full max-w-4xl mx-auto mb-24 text-center sm:text-left">
           <h2 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white mb-3 text-center sm:text-left">
             Simple, Transparent Pricing
           </h2>

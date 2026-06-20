@@ -69,7 +69,8 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(video.instagramUrl);
+      const urlToCopy = video.instagramUrl || video.pinterestUrl || video.youtubeUrl || window.location.href;
+      await navigator.clipboard.writeText(urlToCopy);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
@@ -79,7 +80,18 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
 
   const handleDownload = () => {
     if (!video) return;
-    window.location.assign(video.videoUrl);
+    try {
+      const proxyUrl = `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}&download=1&filename=${video.type}_${video.id}.mp4`;
+      const link = document.createElement('a');
+      link.href = proxyUrl;
+      link.download = `${video.type}_${video.id}.mp4`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error('Download failed:', err);
+      window.location.assign(video.videoUrl);
+    }
   };
 
   const formatNumber = (num: number): string => {

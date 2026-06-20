@@ -9,7 +9,9 @@ export interface VideoItem {
   comments: number;
   caption: string;
   type: 'reel' | 'video';
-  instagramUrl: string;
+  instagramUrl?: string;
+  pinterestUrl?: string;
+  youtubeUrl?: string;
 }
 
 export interface ProfileData {
@@ -33,61 +35,61 @@ export interface ProfileData {
 
 const SAMPLE_VIDEOS = [
   {
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     thumbnail: 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=600&q=80',
     duration: '0:15',
     caption: 'Lost in the Tokyo neon lights 🌃 Exploring Shibuya at midnight. #tokyo #neon #cyberpunk #travel',
   },
   {
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     thumbnail: 'https://images.unsplash.com/photo-1487180142328-0c4e37023af5?auto=format&fit=crop&w=600&q=80',
     duration: '0:30',
     caption: 'Late night sessions with vinyl classics. Nothing beats analog sound 🎶🎛️ #vinyl #retro #musiclife #vibes',
   },
   {
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     thumbnail: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=600&q=80',
     duration: '0:45',
     caption: 'Nature heals. Listening to the quiet flow of the mountain stream 🍃✨ #nature #peace #mountains #relaxation',
   },
   {
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     thumbnail: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=600&q=80',
     duration: '0:22',
     caption: 'Crashing waves and ocean breeze. Finding peace where the land meets the sea 🌊🏖️ #ocean #surf #wanderlust',
   },
   {
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     thumbnail: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80',
     duration: '0:12',
     caption: 'Building the future, one line of code at a time 💻🚀 Midnight debugging sessions. #developer #coding #tech #saas',
   },
   {
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     thumbnail: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=600&q=80',
     duration: '0:18',
     caption: 'Feel the rhythm, chase the light. Dance like nobody is watching 🕺🔥 #dance #neonlights #vibes #freestyle',
   },
   {
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     thumbnail: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80',
     duration: '0:09',
     caption: 'Morning ritual ☕ Starting the day with fresh brew and positive energy. #coffee #morningmotivation #latte',
   },
   {
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     thumbnail: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=600&q=80',
     duration: '0:35',
     caption: 'Chasing goals, leaving doubts behind. Rise and grind! 🏃‍♂️⚡ #fitness #running #motivation #stadium',
   },
   {
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     thumbnail: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80',
     duration: '0:28',
     caption: 'Cafecito & productivity ☕💻 Structuring the next big feature launch. #digitalnomad #remotework #startup',
   },
   {
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     thumbnail: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80',
     duration: '0:14',
     caption: 'Exploring social feeds. Sharing moments in real time 📲✨ #instagram #connect #tech #modernlife',
@@ -115,7 +117,7 @@ export const PRESET_PROFILES: Record<string, ProfileData> = {
       {
         id: 'nasa_v1',
         thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: '0:30',
         uploadDate: '2 hours ago',
         views: 1240000,
@@ -128,7 +130,7 @@ export const PRESET_PROFILES: Record<string, ProfileData> = {
       {
         id: 'nasa_v2',
         thumbnail: 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: '0:45',
         uploadDate: 'Yesterday',
         views: 2800000,
@@ -141,7 +143,7 @@ export const PRESET_PROFILES: Record<string, ProfileData> = {
       {
         id: 'nasa_v3',
         thumbnail: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: '0:15',
         uploadDate: '3 days ago',
         views: 940000,
@@ -154,7 +156,7 @@ export const PRESET_PROFILES: Record<string, ProfileData> = {
       {
         id: 'nasa_v4',
         thumbnail: 'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: '1:10',
         uploadDate: '1 week ago',
         views: 3400000,
@@ -186,7 +188,7 @@ export const PRESET_PROFILES: Record<string, ProfileData> = {
       {
         id: 'nike_v1',
         thumbnail: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: '0:30',
         uploadDate: '5 hours ago',
         views: 4500000,
@@ -199,7 +201,7 @@ export const PRESET_PROFILES: Record<string, ProfileData> = {
       {
         id: 'nike_v2',
         thumbnail: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: '0:15',
         uploadDate: '2 days ago',
         views: 2100000,
@@ -212,7 +214,7 @@ export const PRESET_PROFILES: Record<string, ProfileData> = {
       {
         id: 'nike_v3',
         thumbnail: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: '1:00',
         uploadDate: '5 days ago',
         views: 1800000,
@@ -244,7 +246,7 @@ export const PRESET_PROFILES: Record<string, ProfileData> = {
       {
         id: 'ts_v1',
         thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: '0:25',
         uploadDate: '1 day ago',
         views: 8900000,
@@ -257,7 +259,7 @@ export const PRESET_PROFILES: Record<string, ProfileData> = {
       {
         id: 'ts_v2',
         thumbnail: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=600&q=80',
-        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
         duration: '0:50',
         uploadDate: '1 week ago',
         views: 12400000,
@@ -377,6 +379,14 @@ export function isInstagramVideoUrl(input: string): boolean {
     clean.includes('/reel/') ||
     clean.includes('/reels/') ||
     clean.includes('/tv/')
+  );
+}
+
+export function isPinterestVideoUrl(input: string): boolean {
+  const clean = input.trim().toLowerCase();
+  return (
+    clean.includes('pinterest.com/pin/') ||
+    clean.includes('pin.it/')
   );
 }
 

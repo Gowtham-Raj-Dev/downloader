@@ -48,6 +48,8 @@ export default function PricingTable() {
           <li className="flex items-center gap-3"><Check className="w-5 h-5 text-neutral-400" /> 20 Single Downloads / day</li>
           <li className="flex items-center gap-3"><Check className="w-5 h-5 text-neutral-400" /> Standard Speed</li>
           <li className="flex items-center gap-3"><X className="w-5 h-5 text-red-400" /> Multi-URL Batch Downloading</li>
+          <li className="flex items-center gap-3"><Check className="w-5 h-5 text-green-500" /> Pinterest Downloader</li>
+          <li className="flex items-center gap-3"><Check className="w-5 h-5 text-green-500" /> YT Description Tools</li>
           <li className="flex items-center gap-3"><Check className="w-5 h-5 text-green-500" /> 100% Ad-Free Experience</li>
         </ul>
         {isLoading ? (
@@ -73,6 +75,8 @@ export default function PricingTable() {
           <li className="flex items-center gap-3"><Check className="w-5 h-5 text-green-500" /> 100 Single Downloads / day</li>
           <li className="flex items-center gap-3"><Check className="w-5 h-5 text-green-500" /> Standard Speed</li>
           <li className="flex items-center gap-3"><X className="w-5 h-5 text-red-400" /> Multi-URL Batch Downloading</li>
+          <li className="flex items-center gap-3"><Check className="w-5 h-5 text-green-500" /> Pinterest Downloader</li>
+          <li className="flex items-center gap-3"><Check className="w-5 h-5 text-green-500" /> YT Description Tools</li>
           <li className="flex items-center gap-3"><Check className="w-5 h-5 text-green-500" /> 100% Ad-Free Experience</li>
         </ul>
         {isLoading ? (
@@ -100,11 +104,13 @@ export default function PricingTable() {
           <Zap className="w-3 h-3" /> Most Popular
         </div>
         <h3 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">VIP Pass</h3>
-        <p className="text-3xl font-black text-neutral-900 dark:text-white mb-6">₹10 <span className="text-sm text-neutral-500 font-normal">/ 3 Hours</span></p>
+        <p className="text-3xl font-black text-neutral-900 dark:text-white mb-6">₹29 <span className="text-sm text-neutral-500 font-normal">/ 3 Days</span></p>
         <ul className="space-y-4 mb-8 text-sm text-neutral-700 dark:text-neutral-300 font-medium flex-1">
           <li className="flex items-center gap-3"><Check className="w-5 h-5 text-indigo-500" /> Unlimited Single Downloads</li>
           <li className="flex items-center gap-3"><Check className="w-5 h-5 text-indigo-500" /> Priority High-Speed Servers</li>
           <li className="flex items-center gap-3 font-bold text-indigo-600 dark:text-indigo-400"><Check className="w-5 h-5 text-indigo-500" /> Unlimited Multi-URL Batch Downloading</li>
+          <li className="flex items-center gap-3"><Check className="w-5 h-5 text-indigo-500" /> Pinterest Downloader</li>
+          <li className="flex items-center gap-3"><Check className="w-5 h-5 text-indigo-500" /> YT Description Tools</li>
           <li className="flex items-center gap-3"><Check className="w-5 h-5 text-indigo-500" /> 100% Ad-Free Experience</li>
         </ul>
         {isLoading ? (

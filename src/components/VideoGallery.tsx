@@ -341,7 +341,7 @@ export default function VideoGallery({ videos, onPreview, hideFilters = false }:
 
                   {/* Copy link */}
                   <button
-                    onClick={(e) => handleCopyLink(video.id, video.instagramUrl, e)}
+                    onClick={(e) => handleCopyLink(video.id, video.instagramUrl || video.youtubeUrl || video.pinterestUrl || video.videoUrl, e)}
                     className="p-2 rounded-button bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/60 dark:hover:bg-neutral-800/90 text-neutral-600 dark:text-neutral-300 border border-neutral-200/40 dark:border-neutral-800/60 transition-colors flex items-center justify-center cursor-pointer relative"
                     title="Copy Instagram link"
                   >
@@ -441,7 +441,7 @@ export default function VideoGallery({ videos, onPreview, hideFilters = false }:
                         Preview
                       </button>
                       <button
-                        onClick={(e) => handleCopyLink(video.id, video.instagramUrl, e)}
+                        onClick={(e) => handleCopyLink(video.id, video.instagramUrl || video.youtubeUrl || video.pinterestUrl || video.videoUrl, e)}
                         className="p-2 rounded-button bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/60 dark:hover:bg-neutral-800/90 text-neutral-600 dark:text-neutral-300 border border-neutral-200/40 dark:border-neutral-800/60 transition-colors cursor-pointer"
                         title="Copy Link"
                       >

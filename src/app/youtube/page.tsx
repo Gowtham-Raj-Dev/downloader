@@ -4,7 +4,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ShieldCheck, Sparkles, Download, Copy, Check,
-  ExternalLink, Play, Pause, Archive
+  ExternalLink, Play, Pause, Archive, Loader2
 } from 'lucide-react';
 import YoutubeHeroSection from '@/components/YoutubeHeroSection';
 import LoadingState from '@/components/LoadingState';
@@ -42,6 +42,44 @@ const Youtube = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+const getEstimatedSize = (durationStr: string | undefined, quality: string, exactSizeMb?: number) => {
+  if (exactSizeMb && exactSizeMb > 0) {
+    let ratio = 1;
+    switch (quality) {
+      case '1080': ratio = 1.0; break;
+      case '720': ratio = 0.65; break;
+      case '480': ratio = 0.35; break;
+      case '360': ratio = 0.20; break;
+      default: ratio = 0.35;
+    }
+    return `${(exactSizeMb * ratio).toFixed(1)} MB`;
+  }
+
+  if (!durationStr) return '0.0 MB';
+
+  const parts = durationStr.split(':').map(Number);
+  let seconds = 0;
+  if (parts.length === 2) {
+    seconds = parts[0] * 60 + parts[1];
+  } else if (parts.length === 3) {
+    seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+  } else if (parts.length === 1) {
+    seconds = parts[0];
+  }
+
+  let bitrate = 0;
+  switch (quality) {
+    case '1080': bitrate = 4500; break;
+    case '720': bitrate = 2500; break;
+    case '480': bitrate = 1000; break;
+    case '360': bitrate = 600; break;
+    default: bitrate = 1000;
+  }
+
+  const sizeMb = (seconds * bitrate) / 8192;
+  return `${sizeMb.toFixed(1)} MB`;
+};
+
 export default function YoutubePage() {
   const { isLoggedIn, isPremium, checkDailyLimit, incrementDailyLimit } = useUserLimits();
   const [activeUsername, setActiveUsername] = useState<string | null>(null);
@@ -65,10 +103,13 @@ export default function YoutubePage() {
   const [isCopied, setIsCopied] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadingQuality, setDownloadingQuality] = useState<string | null>(null);
   const [isLoadingBatch, setIsLoadingBatch] = useState<boolean>(false);
   const [loadingCount, setLoadingCount] = useState<number>(0);
   const [previewVideoIndex, setPreviewVideoIndex] = useState<number>(1);
   const [isDownloadAllModalOpen, setIsDownloadAllModalOpen] = useState(false);
+  const [globalQuality, setGlobalQuality] = useState<string>('1080');
+  const [loadedDuration, setLoadedDuration] = useState<string>('0:00');
 
   // Sync player play/pause if state changes
   const togglePlaySingle = () => {
@@ -133,6 +174,7 @@ export default function YoutubePage() {
     setSingleVideo(null);
     setFetchedVideos([]);
     setError(null);
+    setLoadedDuration('0:00');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Identify video URLs
@@ -162,7 +204,7 @@ export default function YoutubePage() {
       setActiveUsername(null);
       return;
     }
-
+    
     if (!isMulti && !(await checkDailyLimit('single'))) {
       setLimitModalType(isLoggedIn ? 'free' : 'guest');
       setIsLoading(false);
@@ -208,6 +250,11 @@ export default function YoutubePage() {
         const likes = Math.floor(views * 0.08) + 380;
         const randomStr = Math.random().toString(36).substring(2, 9);
 
+        // Fallback duration based on hash
+        const fallbackDuration = mediaType === 'shorts'
+          ? `0:${(absHash % 40 + 10).toString().padStart(2, '0')}` // 10s - 49s
+          : `${Math.floor((absHash % 600) / 60) + 2}:${((absHash % 600) % 60).toString().padStart(2, '0')}`;
+
         return {
           id: `${videoId}_${randomStr}`,
           thumbnail: data.thumbnail,
@@ -221,7 +268,10 @@ export default function YoutubePage() {
           instagramUrl: url,
           youtubeUrl: url,
           title: data.title,
-          author: data.author
+          author: data.author,
+          duration: fallbackDuration,
+          sizeMb: data.sizeMb,
+          exactDuration: data.exactDuration
         } as YoutubeVideoItem;
       });
 
@@ -277,15 +327,21 @@ export default function YoutubePage() {
     for (let i = 0; i < videosToDownload.length; i++) {
       const video = videosToDownload[i];
       try {
-        const response = await fetch(video.videoUrl);
+        const response = await fetch(`/api/youtube?url=${encodeURIComponent(video.youtubeUrl || video.videoUrl)}&quality=${globalQuality}`);
         if (!response.ok) throw new Error('Network error');
-        const blob = await response.blob();
         
+        const result = await response.json();
+        if (!result.success || !result.data?.videoUrl) throw new Error('Video extraction failed');
+
+        const fileResponse = await fetch(result.data.videoUrl);
+        if (!fileResponse.ok) throw new Error('Failed to fetch file blob');
+        const blob = await fileResponse.blob();
+
         const blobUrl = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = blobUrl;
-        
-        const cleanTitle = (video.title || `youtube_video_${i+1}`).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+        const cleanTitle = (video.title || `youtube_video_${i + 1}`).replace(/[^a-z0-9]/gi, '_').toLowerCase();
         link.setAttribute('download', `${cleanTitle}.mp4`);
         document.body.appendChild(link);
         link.click();
@@ -298,13 +354,14 @@ export default function YoutubePage() {
       } finally {
         completedCount++;
         setZipProgress(Math.round((completedCount / videosToDownload.length) * 100));
-        
+
         // Small delay so browser processes the download
         await new Promise(resolve => setTimeout(resolve, 800));
       }
     }
 
     setIsZipping(false);
+    setIsDownloadAllModalOpen(false); // Close modal when fully done
     setZipProgress(0);
     if (completedCount > 0) {
       trackUserAction('youtube', 'multi', 'download', completedCount);
@@ -320,6 +377,7 @@ export default function YoutubePage() {
     setError(null);
     setIsZipping(false);
     setZipProgress(0);
+    setLoadedDuration('0:00');
   };
 
   const handleOpenPreview = (video: VideoItem) => {
@@ -345,21 +403,23 @@ export default function YoutubePage() {
   const handleDirectDownload = async (quality: string) => {
     if (!singleVideo) return;
     setIsDownloading(true);
+    setDownloadingQuality(quality);
     setDownloadProgress(50); // visual indicator
     try {
       const response = await fetch(`/api/youtube?url=${encodeURIComponent(singleVideo.youtubeUrl)}&quality=${quality}`);
       const result = await response.json();
       if (result.success && result.data?.videoUrl) {
-         window.location.assign(result.data.videoUrl);
-         trackUserAction('youtube', 'single', 'download', 1);
+        window.location.assign(result.data.videoUrl);
+        trackUserAction('youtube', 'single', 'download', 1);
       } else {
-         alert('Failed to extract ' + quality + 'p video.');
+        alert('Failed to extract ' + quality + 'p video.');
       }
     } catch (err) {
       console.error(err);
       alert('Error fetching video quality.');
     } finally {
       setIsDownloading(false);
+      setDownloadingQuality(null);
       setDownloadProgress(0);
     }
   };
@@ -371,6 +431,10 @@ export default function YoutubePage() {
   };
 
 
+
+  const displayDuration = singleVideo?.exactDuration
+    ? singleVideo.exactDuration
+    : (loadedDuration !== '0:00' ? loadedDuration : (singleVideo?.duration || '0:00'));
 
   return (
     <div className="min-h-screen flex flex-col justify-between selection:bg-red-500/20 selection:text-red-600 dark:selection:text-red-500">
@@ -454,23 +518,47 @@ export default function YoutubePage() {
                 className="w-full flex flex-col items-center"
               >
                 {/* Back breadcrumb for mobile */}
-                <div className="w-full max-w-6xl px-4 mb-4 flex justify-between items-center">
+                <div className="w-full max-w-6xl px-4 mb-4 flex flex-col sm:flex-row justify-between items-center gap-3">
                   <button
                     onClick={handleReset}
-                    className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-button bg-neutral-100 dark:bg-neutral-900/40 text-neutral-600 dark:text-neutral-400 border border-neutral-200/50 dark:border-neutral-800/30 cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-button bg-neutral-100 dark:bg-neutral-900/40 text-neutral-600 dark:text-neutral-400 border border-neutral-200/50 dark:border-neutral-800/30 cursor-pointer self-start sm:self-auto"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Back to Search</span>
                   </button>
 
+                  <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                    <select
+                      value={globalQuality}
+                      onChange={(e) => setGlobalQuality(e.target.value)}
+                      disabled={isZipping}
+                      className="px-3 py-2 pr-8 text-xs font-bold rounded-button bg-neutral-100 dark:bg-neutral-900/80 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 cursor-pointer outline-none focus:ring-2 focus:ring-red-500/50 transition-all text-center shadow-sm"
+                    >
+                      <option value="1080">1080p MP4</option>
+                      <option value="720">720p MP4</option>
+                      <option value="480">480p MP4</option>
+                      <option value="360">360p MP4</option>
+                    </select>
+
                     <button
-                      onClick={() => setIsDownloadAllModalOpen(true)}
+                      onClick={() => {
+                        if (typeof window !== 'undefined' && localStorage.getItem('hasSeenDownloadAllPopup')) {
+                          executeDownloadAllDirect();
+                        } else {
+                          setIsDownloadAllModalOpen(true);
+                        }
+                      }}
                       disabled={isZipping}
                       className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 via-rose-500 to-orange-500 text-white font-bold text-xs rounded-button shadow-lg hover:brightness-105 active:scale-[0.98] transition-all disabled:opacity-80 cursor-pointer"
                     >
-                      <Download className="w-4 h-4" />
+                      {isZipping ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Download className="w-4 h-4" />
+                      )}
                       <span>{isZipping ? `Downloading ${zipProgress}%...` : 'Download All (Direct)'}</span>
                     </button>
+                  </div>
                 </div>
 
                 {/* Header Summary Card */}
@@ -483,9 +571,9 @@ export default function YoutubePage() {
                       <h2 className="text-lg md:text-xl font-extrabold text-neutral-900 dark:text-white">
                         Multiple Video Manager
                       </h2>
-                        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-                          Successfully fetched {fetchedVideos.length} YouTube videos. Click <span className="font-bold text-red-500">Download All</span> to automatically save all videos to your device.
-                        </p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                        Successfully fetched {fetchedVideos.length} YouTube videos. Click <span className="font-bold text-red-500">Download All</span> to automatically save all videos to your device.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -523,10 +611,19 @@ export default function YoutubePage() {
                       src={singleVideo.videoUrl}
                       loop
                       playsInline
+                      preload="metadata"
                       className="w-full h-full object-contain cursor-pointer"
                       onClick={togglePlaySingle}
                       onPlay={() => setIsPlaying(true)}
                       onPause={() => setIsPlaying(false)}
+                      onLoadedMetadata={(e) => {
+                        const seconds = Math.floor(e.currentTarget.duration);
+                        if (!isNaN(seconds) && seconds > 0) {
+                          const m = Math.floor(seconds / 60);
+                          const s = seconds % 60;
+                          setLoadedDuration(`${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
+                        }
+                      }}
                       {...({ referrerPolicy: "no-referrer" } as React.HTMLProps<HTMLVideoElement>)}
                     />
                     {/* Dark overlay & play button */}
@@ -616,34 +713,62 @@ export default function YoutubePage() {
                         <button
                           onClick={() => handleDirectDownload('1080')}
                           disabled={isDownloading}
-                          className="w-full py-2.5 rounded-button bg-gradient-to-r from-red-600 to-rose-500 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:brightness-105 transition-all disabled:opacity-50"
+                          className="w-full py-2 rounded-button bg-gradient-to-r from-red-600 to-rose-500 text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-md hover:brightness-105 transition-all disabled:opacity-50"
                         >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>1080p MP4</span>
+                          <div className="flex items-center gap-1.5">
+                            {downloadingQuality === '1080' ? (
+                              <svg className="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            ) : (
+                              <Download className="w-3.5 h-3.5" />
+                            )}
+                            <span>{downloadingQuality === '1080' ? 'Downloading...' : '1080p MP4'}</span>
+                          </div>
+                          <span className="text-[9px] font-medium opacity-80">{displayDuration} • {getEstimatedSize(displayDuration, '1080', singleVideo.sizeMb)}</span>
                         </button>
                         <button
                           onClick={() => handleDirectDownload('720')}
                           disabled={isDownloading}
-                          className="w-full py-2.5 rounded-button bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:brightness-105 transition-all disabled:opacity-50"
+                          className="w-full py-2 rounded-button bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-md hover:brightness-105 transition-all disabled:opacity-50"
                         >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>720p MP4</span>
+                          <div className="flex items-center gap-1.5">
+                            {downloadingQuality === '720' ? (
+                              <svg className="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            ) : (
+                              <Download className="w-3.5 h-3.5" />
+                            )}
+                            <span>{downloadingQuality === '720' ? 'Downloading...' : '720p MP4'}</span>
+                          </div>
+                          <span className="text-[9px] font-medium opacity-80">{displayDuration} • {getEstimatedSize(displayDuration, '720', singleVideo.sizeMb)}</span>
                         </button>
                         <button
                           onClick={() => handleDirectDownload('480')}
                           disabled={isDownloading}
-                          className="w-full py-2.5 rounded-button bg-neutral-800 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:bg-neutral-700 transition-all disabled:opacity-50"
+                          className="w-full py-2 rounded-button bg-neutral-800 text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-md hover:bg-neutral-700 transition-all disabled:opacity-50"
                         >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>480p MP4</span>
+                          <div className="flex items-center gap-1.5">
+                            {downloadingQuality === '480' ? (
+                              <svg className="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            ) : (
+                              <Download className="w-3.5 h-3.5" />
+                            )}
+                            <span>{downloadingQuality === '480' ? 'Downloading...' : '480p MP4'}</span>
+                          </div>
+                          <span className="text-[9px] font-medium text-neutral-300">{displayDuration} • {getEstimatedSize(displayDuration, '480', singleVideo.sizeMb)}</span>
                         </button>
                         <button
                           onClick={() => handleDirectDownload('360')}
                           disabled={isDownloading}
-                          className="w-full py-2.5 rounded-button bg-neutral-800 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:bg-neutral-700 transition-all disabled:opacity-50"
+                          className="w-full py-2 rounded-button bg-neutral-800 text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-md hover:bg-neutral-700 transition-all disabled:opacity-50"
                         >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>360p MP4</span>
+                          <div className="flex items-center gap-1.5">
+                            {downloadingQuality === '360' ? (
+                              <svg className="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            ) : (
+                              <Download className="w-3.5 h-3.5" />
+                            )}
+                            <span>{downloadingQuality === '360' ? 'Downloading...' : '360p MP4'}</span>
+                          </div>
+                          <span className="text-[9px] font-medium text-neutral-300">{displayDuration} • {getEstimatedSize(displayDuration, '360', singleVideo.sizeMb)}</span>
                         </button>
                       </div>
                     </div>
@@ -671,6 +796,44 @@ export default function YoutubePage() {
           onConfirm={executeDownloadAllDirect}
           onClose={() => setIsDownloadAllModalOpen(false)}
         />
+
+        {/* Full Screen Centered Download Progress Overlay */}
+        <AnimatePresence>
+          {isZipping && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/50"
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                className="relative bg-white dark:bg-zinc-950 border border-neutral-200 dark:border-neutral-800 rounded-outer shadow-2xl p-8 max-w-sm w-full flex flex-col items-center text-center z-10"
+              >
+                <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mb-4">
+                  <Download className="w-8 h-8 text-blue-600 dark:text-blue-500 animate-bounce" />
+                </div>
+                <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">Downloading All Videos</h3>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6">Please keep this window open while we process your request...</p>
+                
+                <div className="w-full bg-neutral-100 dark:bg-neutral-800 h-3 rounded-full overflow-hidden relative mb-2">
+                  <motion.div 
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${zipProgress}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
+                <div className="text-sm font-bold text-neutral-700 dark:text-neutral-300">
+                  {zipProgress}% Complete
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
         <LimitExceededModal
           isOpen={!!limitModalType}

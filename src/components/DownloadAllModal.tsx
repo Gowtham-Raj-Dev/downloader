@@ -63,7 +63,7 @@ export default function DownloadAllModal({ isOpen, videoCount, onConfirm, onClos
               </p>
               <div className="bg-white dark:bg-zinc-950 border border-neutral-200 dark:border-neutral-700 shadow-sm rounded-lg p-3 text-sm">
                 <p className="font-medium text-neutral-800 dark:text-neutral-200 mb-3 text-xs">
-                  This site wants to <br/> <span className="font-normal text-neutral-600 dark:text-neutral-400">Download multiple files</span>
+                  This site wants to <br /> <span className="font-normal text-neutral-600 dark:text-neutral-400">Download multiple files</span>
                 </p>
                 <div className="flex gap-2 justify-end">
                   <span className="px-3 py-1.5 rounded-button text-xs font-medium bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-neutral-400 line-through opacity-50">Block</span>
@@ -94,6 +94,9 @@ export default function DownloadAllModal({ isOpen, videoCount, onConfirm, onClos
             </button>
             <button
               onClick={() => {
+                if (typeof window !== 'undefined') {
+                  localStorage.setItem('hasSeenDownloadAllPopup', 'true');
+                }
                 onConfirm();
                 onClose();
               }}

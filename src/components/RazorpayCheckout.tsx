@@ -40,7 +40,7 @@ export default function RazorpayCheckout({ userEmail, onSuccess }: RazorpayCheck
       const res = await fetch('/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: 10, currency: 'INR' }),
+        body: JSON.stringify({ amount: 29, currency: 'INR' }),
       });
 
       const data = await res.json();
@@ -56,7 +56,7 @@ export default function RazorpayCheckout({ userEmail, onSuccess }: RazorpayCheck
         amount: order.amount,
         currency: order.currency,
         name: 'CodeLove Downloader',
-        description: '3-Hour Premium Pass',
+        description: '3-Days Premium Pass',
         order_id: order.id,
         handler: async function (response: unknown) {
           const res = response as { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string };
@@ -117,7 +117,7 @@ export default function RazorpayCheckout({ userEmail, onSuccess }: RazorpayCheck
       </div>
       <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-200">VIP Pass</h3>
       <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 mb-5">
-        Unlock unrestricted Batch downloads & VIP features for 3 full hours.
+        Unlock unrestricted Batch downloads & VIP features for 3 full days.
       </p>
 
       <button
@@ -131,7 +131,7 @@ export default function RazorpayCheckout({ userEmail, onSuccess }: RazorpayCheck
             <span>Connecting Securely...</span>
           </>
         ) : (
-          <span>Pay ₹10 Securely</span>
+          <span>Pay ₹29 Securely</span>
         )}
       </button>
 

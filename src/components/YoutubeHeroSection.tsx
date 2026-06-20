@@ -108,8 +108,8 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
         transition={{ duration: 0.6 }}
         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-red-600/10 to-rose-500/10 border border-red-500/20 text-red-600 dark:text-red-400 mb-6"
       >
-        <Sparkles className="w-3.5 h-3.5" />
-        <span>Instantly download YouTube Shorts (Normal videos not supported)</span>
+        <Sparkles className="w-3.5 h-3.5 shrink-0" />
+        <span className="text-center">Instantly download YouTube Shorts only</span>
       </motion.div>
 
       {/* Hero Headings */}
@@ -159,22 +159,20 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
           <Link
             href={basePath || '/youtube'}
             onClick={() => setUrl('')}
-            className={`flex-1 pb-3 text-center font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${
-              !isBatch
+            className={`flex-1 pb-3 text-center font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${!isBatch
                 ? 'border-red-600 text-red-600'
                 : 'border-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
-            }`}
+              }`}
           >
             Single Link
           </Link>
           <Link
             href={`${basePath || '/youtube'}/multi-url`}
             onClick={() => setUrlFields(['', ''])}
-            className={`flex-1 pb-3 text-center font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${
-              isBatch
+            className={`flex-1 pb-3 text-center font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${isBatch
                 ? 'border-red-600 text-red-600'
                 : 'border-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
-            }`}
+              }`}
           >
             Multiple Links (Batch)
           </Link>
@@ -229,11 +227,11 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
             <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto mb-6">
               Batch downloading multiple URLs at once is a premium feature. Upgrade to fetch multiple videos simultaneously with zero limits!
             </p>
-            <Link 
+            <Link
               href="/profile"
               className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-button shadow-md transition-all cursor-pointer"
             >
-              <span>Unlock Premium for ₹10</span>
+              <span>Unlock Premium for ₹29</span>
               <Sparkles className="w-4 h-4" />
             </Link>
           </div>

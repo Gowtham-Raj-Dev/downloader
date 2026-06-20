@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL('https://downloader.codelove.in'),
   title: {
-    template: "%s | MediaExplorer Hub",
+    template: "%s | Insta Downloader & Video Downloader Hub",
     default: "Free Video Downloader - Insta Downloader & YouTube Loader",
   },
   description: "Best free video downloader online. Fast, responsive, and free insta downloader and YouTube downloader tool. Download public Instagram videos, reels, and YouTube shorts instantly.",
@@ -65,9 +65,6 @@ export const metadata: Metadata = {
   },
   verification: {
     google: "add-your-google-site-verification-here", // User can replace this later
-  },
-  icons: {
-    icon: '/icon.png',
   },
 };
 

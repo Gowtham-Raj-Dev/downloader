@@ -2,50 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Download } from 'lucide-react';
+import { Download, ChevronDown } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { auth } from '@/lib/firebase';
 import { User } from 'firebase/auth';
-
-// Custom Instagram SVG icon
-const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-  </svg>
-);
-
-// Custom Youtube SVG icon
-const YoutubeIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.41 19c1.72.46 8.59.46 8.59.46s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z" />
-    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="currentColor" />
-  </svg>
-);
 
 export default function Header() {
   const pathname = usePathname();
@@ -67,21 +28,44 @@ export default function Header() {
   const isHome = pathname === '/';
   const isInstagram = pathname.startsWith('/instagram');
   const isYoutube = pathname.startsWith('/youtube');
+  const isPinterest = pathname.startsWith('/pinterest');
+
+  // Helper to determine if we are in platform
+  const isPlatform = isInstagram || isYoutube || isPinterest;
+
+  const [isPlatformOpen, setIsPlatformOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsPlatformOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close dropdown when a link is clicked
+  const handleLinkClick = () => {
+    setIsPlatformOpen(false);
+  };
 
   return (
-    <header className="sticky top-0 z-40 bg-white dark:bg-black border-b border-neutral-200/80 dark:border-zinc-900 px-4 md:px-8 py-4">
+    <header className="sticky top-0 z-50 bg-white dark:bg-black border-b border-neutral-200/80 dark:border-zinc-900 px-4 md:px-8 py-4">
       <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-y-4 md:gap-y-0">
-        
+
         {/* Brand / Logo */}
         <div className="flex items-center">
           <Link href="/" className="flex items-center gap-2 select-none group">
-            <div className={`p-2 rounded-xl text-white shadow-md transition-all duration-300 ${
-              isInstagram 
-                ? 'bg-gradient-to-tr from-instagram-purple via-instagram-pink to-instagram-orange' 
-                : isYoutube 
-                  ? 'bg-gradient-to-tr from-red-700 via-red-600 to-rose-500' 
+            <div className={`p-2 rounded-xl text-white shadow-md transition-all duration-300 ${isInstagram
+              ? 'bg-gradient-to-tr from-instagram-purple via-instagram-pink to-instagram-orange'
+              : isYoutube
+                ? 'bg-gradient-to-tr from-red-700 via-red-600 to-rose-500'
+                : isPinterest
+                  ? 'bg-gradient-to-tr from-[#E60023] via-red-600 to-[#E60023]'
                   : 'bg-gradient-to-tr from-rose-600 via-pink-600 to-orange-500'
-            }`}>
+              }`}>
               <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </div>
             <div className="text-left">
@@ -97,41 +81,73 @@ export default function Header() {
 
         {/* Menu Navigation */}
         <div className="w-full md:w-auto order-last md:order-none flex justify-center">
-          <nav className="flex items-center bg-neutral-100 dark:bg-zinc-900/60 p-1.5 rounded-full border border-neutral-200/50 dark:border-zinc-800/60 text-xs overflow-x-auto custom-scrollbar">
+          <nav className="flex items-center bg-neutral-100 dark:bg-zinc-900/60 p-1.5 rounded-full border border-neutral-200/50 dark:border-zinc-800/60 text-xs overflow-visible">
             <Link
               href="/"
-              className={`px-3 md:px-4 py-2 rounded-full font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
-                isHome
-                  ? 'bg-white dark:bg-zinc-800 text-neutral-950 dark:text-white shadow-sm'
-                  : 'text-neutral-500 hover:text-neutral-950 dark:hover:text-white'
-              }`}
+              className={`px-3 md:px-4 py-2 rounded-full font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${isHome
+                ? 'bg-white dark:bg-zinc-800 text-neutral-950 dark:text-white shadow-sm'
+                : 'text-neutral-500 hover:text-neutral-950 dark:hover:text-white'
+                }`}
             >
               Home
             </Link>
-            
+
             <Link
-              href="/instagram"
-              className={`px-3 md:px-4 py-2 rounded-full font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                isInstagram
-                  ? 'bg-white dark:bg-zinc-800 text-neutral-950 dark:text-white shadow-sm'
-                  : 'text-neutral-500 hover:text-neutral-950 dark:hover:text-white'
-              }`}
+              href="/#how-it-works"
+              className="px-3 md:px-4 py-2 rounded-full font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap text-neutral-500 hover:text-neutral-950 dark:hover:text-white"
             >
-              <InstagramIcon className="w-3.5 h-3.5" />
-              <span>Instagram</span>
+              How it works
             </Link>
 
             <Link
-              href="/youtube"
-              className={`px-3 md:px-4 py-2 rounded-full font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                isYoutube
+              href="/#pricing"
+              className="px-3 md:px-4 py-2 rounded-full font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap text-neutral-500 hover:text-neutral-950 dark:hover:text-white"
+            >
+              Pricing
+            </Link>
+
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setIsPlatformOpen(!isPlatformOpen)}
+                className={`px-3 md:px-4 py-2 rounded-full font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${isPlatform || isPlatformOpen
                   ? 'bg-white dark:bg-zinc-800 text-neutral-950 dark:text-white shadow-sm'
                   : 'text-neutral-500 hover:text-neutral-950 dark:hover:text-white'
-              }`}
-            >
-              <YoutubeIcon className="w-3.5 h-3.5" />
-              <span>YouTube</span>
-            </Link>
+                  }`}
+              >
+                <span>Platform</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isPlatformOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Dropdown Menu */}
+              <div
+                className={`absolute top-full right-0 md:right-auto md:left-1/2 md:-translate-x-1/2 mt-2 w-56 bg-white dark:bg-zinc-900 border border-neutral-200/80 dark:border-zinc-800/80 rounded-2xl shadow-xl transition-all duration-200 flex flex-col py-2 z-50 origin-top-right md:origin-top ${isPlatformOpen ? 'opacity-100 visible scale-100' : 'opacity-0 invisible scale-95'
+                  }`}
+              >
+                <Link href="/instagram" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
+                  Instagram Downloader
+                </Link>
+                <Link href="/instagram/multi-url" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
+                  Multi Instagram Downloader
+                </Link>
+                <div className="h-px w-full bg-neutral-100 dark:bg-zinc-800/50 my-1"></div>
+                <Link href="/youtube" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
+                  YouTube Downloader
+                </Link>
+                <Link href="/youtube/multi-url" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
+                  Multi YouTube Downloader
+                </Link>
+                <Link href="/youtube/description-extractor" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
+                  YouTube Description Extractor
+                </Link>
+                <div className="h-px w-full bg-neutral-100 dark:bg-zinc-800/50 my-1"></div>
+                <Link href="/pinterest" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
+                  Pinterest Downloader
+                </Link>
+                <Link href="/pinterest/multi-url" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
+                  Multi Pinterest Downloader
+                </Link>
+              </div>
+            </div>
           </nav>
         </div>
 

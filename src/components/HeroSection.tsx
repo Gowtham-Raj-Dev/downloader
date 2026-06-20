@@ -11,15 +11,19 @@ import { doc, getDoc } from 'firebase/firestore';
 
 
 interface HeroSectionProps {
-  onFetch: (inputs: string[]) => void;
-  isLoading: boolean;
+  onFetch: (inputs: string[], mediaType?: 'video' | 'shorts') => void;
+  isLoading?: boolean;
   error?: string | null;
+  isPremiumFeature?: boolean;
 }
 
-export default function HeroSection({ onFetch, isLoading, error }: HeroSectionProps) {
+export default function HeroSection({ onFetch, isLoading, error, isPremiumFeature = true }: HeroSectionProps) {
   const pathname = usePathname();
-  const isBatch = pathname?.endsWith('/multi-url');
+  const isBatch = pathname?.includes('/multi-url');
   const basePath = isBatch ? pathname.replace('/multi-url', '') : pathname;
+
+  const isYoutube = pathname?.includes('/youtube');
+  const isPinterest = pathname?.includes('/pinterest');
 
   const [url, setUrl] = useReactState('');
   const [urlFields, setUrlFields] = useReactState<string[]>(['', '']); // 2 empty boxes by default
@@ -108,10 +112,13 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-instagram-pink/10 to-instagram-orange/10 border border-instagram-pink/20 text-instagram-pink dark:text-instagram-orange mb-6"
+        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-6 border ${isPinterest
+            ? 'bg-red-500/10 border-red-500/20 text-[#E60023] dark:text-red-500'
+            : 'bg-gradient-to-r from-instagram-pink/10 to-instagram-orange/10 border-instagram-pink/20 text-instagram-pink dark:text-instagram-orange'
+          }`}
       >
         <Sparkles className="w-3.5 h-3.5" />
-        <span>Instantly download public reels & videos</span>
+        <span>Instantly download public videos & media</span>
       </motion.div>
 
       {/* Hero Headings */}
@@ -123,8 +130,8 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
       >
         Free{' '}
         {isBatch ? 'Multiple ' : ''}
-        <span className="shine-insta">
-          Instagram Video{isBatch ? 's' : ''}
+        <span className={isPinterest ? "shine-pinterest" : isYoutube ? "shine-youtube" : "shine-insta"}>
+          {isPinterest ? "Pinterest Video" : isYoutube ? "YouTube Video" : "Instagram Video"}{isBatch ? 's' : ''}
         </span>{' '}
         Downloader
       </motion.h1>
@@ -135,7 +142,7 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
         transition={{ duration: 0.6, delay: 0.2 }}
         className="text-base md:text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto mb-10 leading-relaxed font-normal"
       >
-        Paste any Instagram Reel or Video link and instantly fetch, play, and download your media.
+        Paste any {isPinterest ? "Pinterest pin" : isYoutube ? "YouTube video" : "Instagram Reel or Video"} link and instantly fetch, play, and download your media.
       </motion.p>
 
       {error && (
@@ -159,24 +166,22 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
         {/* Modern Switcher Tabs */}
         <div className="flex border-b border-neutral-200/50 dark:border-neutral-800/30 mb-5 text-xs">
           <Link
-            href={basePath || '/instagram'}
+            href={basePath || '/'}
             onClick={() => setUrl('')}
-            className={`flex-1 pb-3 text-center font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${
-              !isBatch
-                ? 'border-instagram-pink text-instagram-pink'
+            className={`flex-1 pb-3 text-center font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${!isBatch
+                ? (isPinterest ? 'border-[#E60023] text-[#E60023]' : 'border-instagram-pink text-instagram-pink')
                 : 'border-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
-            }`}
+              }`}
           >
             Single Link
           </Link>
           <Link
-            href={`${basePath || '/instagram'}/multi-url`}
+            href={`${basePath || ''}/multi-url`}
             onClick={() => setUrlFields(['', ''])}
-            className={`flex-1 pb-3 text-center font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${
-              isBatch
-                ? 'border-instagram-pink text-instagram-pink'
+            className={`flex-1 pb-3 text-center font-bold uppercase tracking-wider transition-all relative border-b-2 cursor-pointer ${isBatch
+                ? (isPinterest ? 'border-[#E60023] text-[#E60023]' : 'border-instagram-pink text-instagram-pink')
                 : 'border-transparent text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
-            }`}
+              }`}
           >
             Multiple Links (Batch)
           </Link>
@@ -192,7 +197,7 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="Paste Instagram video or reel URL (e.g. instagram.com/reel/...)"
+                placeholder={`Paste ${isPinterest ? 'Pinterest' : isYoutube ? 'YouTube Shorts' : 'Instagram'} video or reel URL`}
                 className="w-full pl-11 pr-24 py-3.5 bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-instagram-pink/50 dark:focus:ring-instagram-orange/50 transition-all text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 dark:placeholder-neutral-600"
                 disabled={isLoading}
               />
@@ -211,7 +216,10 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
             <button
               type="submit"
               disabled={isLoading || isSubmitDisabled}
-              className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange text-white font-semibold rounded-button shadow-md hover:shadow-lg hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none min-h-[46px]"
+              className={`w-full sm:w-auto px-6 py-3.5 text-white font-semibold rounded-button shadow-md hover:shadow-lg hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none min-h-[46px] ${isPinterest
+                  ? 'bg-gradient-to-r from-red-700 via-[#E60023] to-red-600'
+                  : 'bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange'
+                }`}
             >
               <span>Fetch Videos</span>
               <ArrowRight className="w-4 h-4" />
@@ -222,7 +230,7 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
             <div className="w-8 h-8 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
             <span className="text-xs font-semibold text-neutral-500 animate-pulse uppercase tracking-wider">Checking Premium Status...</span>
           </div>
-        ) : !isPremium ? (
+        ) : (!isPremium && isPremiumFeature) ? (
           <div className="py-8 px-4 text-center border border-indigo-200 dark:border-indigo-900/50 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20">
             <div className="w-12 h-12 mx-auto bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-500 mb-3">
               <Lock className="w-6 h-6" />
@@ -231,11 +239,11 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
             <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto mb-6">
               Batch downloading multiple URLs at once is a premium feature. Upgrade to fetch multiple videos simultaneously with zero limits!
             </p>
-            <Link 
+            <Link
               href="/profile"
               className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-button shadow-md transition-all cursor-pointer"
             >
-              <span>Unlock Premium for ₹10</span>
+              <span>Unlock Premium for ₹29</span>
               <Sparkles className="w-4 h-4" />
             </Link>
           </div>
@@ -252,7 +260,7 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
                       type="text"
                       value={field}
                       onChange={(e) => handleFieldChange(index, e.target.value)}
-                      placeholder={`Paste Instagram video URL #${index + 1}`}
+                      placeholder={`Paste ${isPinterest ? 'Pinterest' : isYoutube ? 'YouTube Shorts' : 'Instagram'} video URL #${index + 1}`}
                       className="w-full pl-10 pr-20 py-3 bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-instagram-pink/50 dark:focus:ring-instagram-orange/50 transition-all text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 dark:placeholder-neutral-600"
                       disabled={isLoading}
                     />
@@ -295,7 +303,10 @@ export default function HeroSection({ onFetch, isLoading, error }: HeroSectionPr
               <button
                 type="submit"
                 disabled={isLoading || isSubmitDisabled}
-                className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange text-white font-semibold rounded-button shadow-md hover:shadow-lg hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none min-h-[46px]"
+                className={`w-full sm:w-auto px-8 py-3.5 text-white font-semibold rounded-button shadow-md hover:shadow-lg hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none min-h-[46px] ${isPinterest
+                    ? 'bg-gradient-to-r from-red-700 via-[#E60023] to-red-600'
+                    : 'bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange'
+                  }`}
               >
                 <span>Fetch Videos</span>
                 <ArrowRight className="w-4 h-4" />

@@ -8,6 +8,7 @@
   --color-instagram-orange: #f77737;
   --color-instagram-yellow: #fcaf45;
   --color-instagram-blue: #405de6;
+  --color-pinterest-red: #E60023;
   
   --radius-card: 16px;
   --radius-button: 12px;
@@ -49,7 +50,7 @@ body {
     radial-gradient(at 50% 100%, rgba(247, 119, 55, 0.03) 0px, transparent 50%);
   background-attachment: fixed;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -75,31 +76,42 @@ body {
   border: 1px solid var(--card-border);
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Custom Scrollbar - Only for Desktop */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 9999px;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 9999px;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+/* Aggressively Hide Scrollbars on Mobile */
+@media (max-width: 767px) {
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    -webkit-appearance: none !important;
+  }
 }
 
 /* Skeleton animation */
@@ -191,6 +203,24 @@ body {
     #dc2626 60%,   
     #f97316 80%,   
     #dc2626 100%   
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shiny-text 4s linear infinite;
+}
+
+.shine-pinterest {
+  background: linear-gradient(
+    to right,
+    #bd081c 0%,    
+    #E60023 20%,   
+    #bd081c 40%,   
+    #ffffff 50%,   
+    #bd081c 60%,   
+    #E60023 80%,   
+    #bd081c 100%   
   );
   background-size: 200% auto;
   -webkit-background-clip: text;
