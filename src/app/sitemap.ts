@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'daily',
       priority: 1,
     },
+    // Instagram Tools
     {
       url: `${baseUrl}/instagram`,
       lastModified: new Date(),
@@ -17,23 +18,44 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/instagram/multi-url`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    // YouTube Tools
+    {
       url: `${baseUrl}/youtube`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/multi-url`,
+      url: `${baseUrl}/youtube/multi-url`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/pricing`,
+      url: `${baseUrl}/youtube/description-extractor`,
       lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
+      changeFrequency: 'weekly',
+      priority: 0.8,
     },
+    // Pinterest Tools
+    {
+      url: `${baseUrl}/pinterest`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/pinterest/multi-url`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    // Legal Pages
     {
       url: `${baseUrl}/terms`,
       lastModified: new Date(),

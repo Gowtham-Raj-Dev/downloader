@@ -6,9 +6,11 @@ import { Loader2, ShieldCheck } from 'lucide-react';
 interface RazorpayCheckoutProps {
   userEmail: string;
   onSuccess: () => void;
+  variant?: 'card' | 'compact';
+  buttonClassName?: string;
 }
 
-export default function RazorpayCheckout({ userEmail, onSuccess }: RazorpayCheckoutProps) {
+export default function RazorpayCheckout({ userEmail, onSuccess, variant = 'card', buttonClassName }: RazorpayCheckoutProps) {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const loadRazorpayScript = () => {
@@ -110,6 +112,31 @@ export default function RazorpayCheckout({ userEmail, onSuccess }: RazorpayCheck
     }
   };
 
+  const buttonContent = (
+    <button
+      onClick={handlePayment}
+      disabled={isProcessing || !userEmail}
+      className={buttonClassName || "w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"}
+    >
+      <div className="flex items-center justify-center gap-2 w-full">
+        {isProcessing ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Loading...</span>
+          </>
+        ) : variant === 'compact' ? (
+          <span>Explore Now 🚀</span>
+        ) : (
+          <span>Pay ₹29 Securely</span>
+        )}
+      </div>
+    </button>
+  );
+
+  if (variant === 'compact') {
+    return buttonContent;
+  }
+
   return (
     <div className="w-full max-w-sm mx-auto p-6 bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-indigo-500/20 rounded-xl shadow-sm text-center">
       <div className="w-12 h-12 mx-auto bg-indigo-500/20 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-3">
@@ -120,20 +147,7 @@ export default function RazorpayCheckout({ userEmail, onSuccess }: RazorpayCheck
         Unlock unrestricted Batch downloads & VIP features for 3 full days.
       </p>
 
-      <button
-        onClick={handlePayment}
-        disabled={isProcessing || !userEmail}
-        className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-      >
-        {isProcessing ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Connecting Securely...</span>
-          </>
-        ) : (
-          <span>Pay ₹29 Securely</span>
-        )}
-      </button>
+      {buttonContent}
 
       <p className="text-[9px] text-neutral-400 mt-3 font-medium uppercase tracking-wider">
         Secured by Razorpay
