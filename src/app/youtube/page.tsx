@@ -101,6 +101,7 @@ export default function YoutubePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadingQuality, setDownloadingQuality] = useState<string | null>(null);
@@ -131,8 +132,10 @@ export default function YoutubePage() {
   };
 
   const [selectedQuality, setSelectedQuality] = useState<string>('1080');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isChangingQuality, setIsChangingQuality] = useState<boolean>(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleQualityChange = async (newQuality: string) => {
     const previousQuality = selectedQuality;
     setSelectedQuality(newQuality);
@@ -424,6 +427,7 @@ export default function YoutubePage() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDownloadVideo = (video: YoutubeVideoItem) => {
     window.location.assign(video.videoUrl);
     const type = fetchedVideos.length > 0 ? 'multi' : 'single';

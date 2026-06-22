@@ -63,7 +63,9 @@ export default function InstagramPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [downloadProgress, setDownloadProgress] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isDownloading, setIsDownloading] = useState(false);
   const [isLoadingBatch, setIsLoadingBatch] = useState<boolean>(false);
   const [loadingCount, setLoadingCount] = useState<number>(0);

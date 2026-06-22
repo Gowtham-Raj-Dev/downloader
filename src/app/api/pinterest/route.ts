@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
       if (pwsDataMatch) {
         const pwsData = JSON.parse(pwsDataMatch[1]);
         // Recursively search for video URLs in the JSON
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const findVideo = (obj: any) => {
           if (!obj) return;
           if (typeof obj === 'string') {

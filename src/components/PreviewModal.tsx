@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Play, Pause, Volume2, VolumeX, Copy, Check, Download, 
-  Eye, Calendar, Heart, MessageCircle, Info, ExternalLink 
+  Calendar, Info, ExternalLink 
 } from 'lucide-react';
 import { VideoItem } from '../data/mockProfiles';
 
@@ -15,6 +15,7 @@ interface PreviewModalProps {
   onClose: () => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }: PreviewModalProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -92,14 +93,6 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
       console.error('Download failed:', err);
       window.location.assign(video.videoUrl);
     }
-  };
-
-  const formatNumber = (num: number): string => {
-    return num >= 1000000 
-      ? (num / 1000000).toFixed(1) + 'M' 
-      : num >= 1000 
-        ? (num / 1000).toFixed(1) + 'K' 
-        : num.toString();
   };
 
   return (

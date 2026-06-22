@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, ShieldCheck, Sparkles, Heart, Download, Eye, Copy, Check,
+  ArrowLeft, ShieldCheck, Sparkles, Download, Copy, Check,
   ExternalLink, Play, Pause, Archive
 } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
@@ -57,7 +57,9 @@ export default function PinterestPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [downloadProgress, setDownloadProgress] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isDownloading, setIsDownloading] = useState(false);
   const [isLoadingBatch, setIsLoadingBatch] = useState<boolean>(false);
   const [loadingCount, setLoadingCount] = useState<number>(0);
@@ -292,14 +294,6 @@ export default function PinterestPage() {
       console.error('Download failed:', err);
       window.open(video.videoUrl, '_blank');
     }
-  };
-
-  const formatNumber = (num: number): string => {
-    return num >= 1000000
-      ? (num / 1000000).toFixed(1) + 'M'
-      : num >= 1000
-        ? (num / 1000).toFixed(1) + 'K'
-        : num.toString();
   };
 
   return (

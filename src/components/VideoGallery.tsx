@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   LayoutGrid, List, Search, Play, Copy, Check, Download, 
-  Eye, Calendar, Filter, ArrowUpDown, ChevronDown, Loader2 
+  Calendar, Filter, ArrowUpDown, ChevronDown, Loader2 
 } from 'lucide-react';
 import { VideoItem } from '../data/mockProfiles';
 
@@ -161,14 +161,6 @@ export default function VideoGallery({ videos, onPreview, hideFilters = false }:
     } finally {
       setDownloadingId(null);
     }
-  };
-
-  const formatNumber = (num: number): string => {
-    return num >= 1000000 
-      ? (num / 1000000).toFixed(1) + 'M' 
-      : num >= 1000 
-        ? (num / 1000).toFixed(1) + 'K' 
-        : num.toString();
   };
 
   return (

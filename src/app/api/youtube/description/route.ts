@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
         if (detailedDesc) {
           description = detailedDesc;
         }
-      } catch (e) {
+      } catch {
         console.warn('Failed to parse ytInitialPlayerResponse JSON');
       }
     }
