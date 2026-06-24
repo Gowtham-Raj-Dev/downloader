@@ -4,13 +4,11 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ShieldCheck, Sparkles, Download, Copy, Check,
-  ExternalLink, Archive, Image as ImageIcon
+  ExternalLink, Image as ImageIcon
 } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
 import LoadingState from '@/components/LoadingState';
-import VideoGallery from '@/components/VideoGallery';
 import PreviewModal from '@/components/PreviewModal';
-import DownloadAllModal from '@/components/DownloadAllModal';
 import LimitExceededModal from '@/components/LimitExceededModal';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -37,7 +35,7 @@ const Pinterest = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function PinterestImagePage() {
-  const { isLoggedIn, isPremium, checkDailyLimit, incrementDailyLimit } = useUserLimits();
+  const { isLoggedIn, checkDailyLimit, incrementDailyLimit } = useUserLimits();
   const [activeUsername, setActiveUsername] = useState<string | null>(null);
   const [singleVideo, setSingleVideo] = useState<VideoItem | null>(null);
   const [fetchedVideos, setFetchedVideos] = useState<VideoItem[]>([]);
@@ -93,7 +91,7 @@ export default function PinterestImagePage() {
       let result;
       try {
         result = await response.json();
-      } catch (e) {
+      } catch {
         throw new Error(`Failed to fetch: ${videoUrls[0]}`);
       }
 
@@ -150,10 +148,7 @@ export default function PinterestImagePage() {
     setZipProgress(0);
   };
 
-  const handleOpenPreview = (video: VideoItem) => {
-    setPreviewVideo(video);
-    setIsModalOpen(true);
-  };
+
 
   const handleCopySingleLink = async () => {
     if (!singleVideo) return;
@@ -206,7 +201,7 @@ export default function PinterestImagePage() {
                 transition={{ duration: 0.4 }}
                 className="w-full"
               >
-                <HeroSection onFetch={handleFetchProfile} isLoading={isLoading} error={error} placeholder="Paste Pinterest Image URL here..." />
+                <HeroSection onFetch={handleFetchProfile} isLoading={isLoading} error={error} />
 
                 {/* Feature Highlights */}
                 <div className="max-w-4xl mx-auto px-4 mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">

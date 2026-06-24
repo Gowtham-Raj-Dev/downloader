@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, ShieldCheck, Sparkles, Download, Copy, Check,
-  ExternalLink, Archive, Image as ImageIcon
+  ArrowLeft, ShieldCheck, Sparkles, Download, Archive
 } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
 import LoadingState from '@/components/LoadingState';
@@ -37,7 +36,7 @@ const Pinterest = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function PinterestMultiImagePage() {
-  const { isLoggedIn, isPremium, checkDailyLimit, incrementDailyLimit } = useUserLimits();
+  const { isLoggedIn, checkDailyLimit } = useUserLimits();
   const [activeUsername, setActiveUsername] = useState<string | null>(null);
   const [singleVideo, setSingleVideo] = useState<VideoItem | null>(null);
   const [fetchedVideos, setFetchedVideos] = useState<VideoItem[]>([]);
@@ -53,14 +52,13 @@ export default function PinterestMultiImagePage() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [limitModalType, setLimitModalType] = useState<'guest' | 'free' | 'multi' | null>(null);
 
-  const [isCopied, setIsCopied] = useState(false);
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [downloadProgress, setDownloadProgress] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isDownloading, setIsDownloading] = useState(false);
   const [isLoadingBatch, setIsLoadingBatch] = useState<boolean>(false);
   const [loadingCount, setLoadingCount] = useState<number>(0);
-  const [previewVideoIndex, setPreviewVideoIndex] = useState<number>(1);
   const [isDownloadAllModalOpen, setIsDownloadAllModalOpen] = useState(false);
 
   const handleFetchProfile = async (inputs: string[]) => {
@@ -106,7 +104,7 @@ export default function PinterestMultiImagePage() {
         let result;
         try {
           result = await response.json();
-        } catch (e) {
+        } catch {
           throw new Error(`Failed to fetch: ${url}`);
         }
 
@@ -224,34 +222,7 @@ export default function PinterestMultiImagePage() {
     setIsModalOpen(true);
   };
 
-  const handleCopySingleLink = async () => {
-    if (!singleVideo) return;
-    try {
-      await navigator.clipboard.writeText(singleVideo.pinterestUrl || '');
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy link', err);
-    }
-  };
 
-  const handleDownloadVideo = async (video: VideoItem) => {
-    try {
-      const proxyUrl = `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}&download=1&filename=pinterest_image_${video.id}.jpg`;
-      const link = document.createElement('a');
-      link.href = proxyUrl;
-      link.download = `pinterest_image_${video.id}.jpg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      const type = fetchedVideos.length > 0 ? 'multi' : 'single';
-      trackUserAction('pinterest', type, 'download', 1);
-    } catch (err) {
-      console.error('Download failed:', err);
-      window.open(video.videoUrl, '_blank');
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col justify-between selection:bg-[#E60023]/20 selection:text-[#E60023] dark:selection:text-red-600">

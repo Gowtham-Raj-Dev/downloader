@@ -4,13 +4,11 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ShieldCheck, Sparkles, Download, Copy, Check,
-  ExternalLink, Play, Pause, Archive
+  ExternalLink, Play, Pause
 } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
 import LoadingState from '@/components/LoadingState';
-import VideoGallery from '@/components/VideoGallery';
 import PreviewModal from '@/components/PreviewModal';
-import DownloadAllModal from '@/components/DownloadAllModal';
 import LimitExceededModal from '@/components/LimitExceededModal';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -130,7 +128,7 @@ export default function PinterestPage() {
       let result;
       try {
         result = await response.json();
-      } catch (e) {
+      } catch {
         throw new Error(`Failed to fetch: ${videoUrls[0]}`);
       }
 
@@ -189,10 +187,7 @@ export default function PinterestPage() {
     setZipProgress(0);
   };
 
-  const handleOpenPreview = (video: VideoItem) => {
-    setPreviewVideo(video);
-    setIsModalOpen(true);
-  };
+
 
   const handleCopySingleLink = async () => {
     if (!singleVideo) return;

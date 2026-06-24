@@ -15,10 +15,9 @@ interface HeroSectionProps {
   isLoading?: boolean;
   error?: string | null;
   isPremiumFeature?: boolean;
-  placeholder?: string;
 }
 
-export default function HeroSection({ onFetch, isLoading, error, isPremiumFeature = true, placeholder }: HeroSectionProps) {
+export default function HeroSection({ onFetch, isLoading, error, isPremiumFeature = true }: HeroSectionProps) {
   const pathname = usePathname();
   const isBatch = pathname?.includes('/multi-url');
   const basePath = isBatch ? pathname.replace('/multi-url', '') : pathname;

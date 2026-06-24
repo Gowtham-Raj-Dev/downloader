@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
             }
           }
         }
-      } catch (e) {
+      } catch {
         // Ignore JSON parse errors and continue to fallback strategies
       }
     }

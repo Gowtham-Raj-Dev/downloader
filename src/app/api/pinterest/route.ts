@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
       }
       
       if (!bestThumbnail && jpgMatches.length > 0) {
-        bestThumbnail = jpgMatches[0];
+        bestThumbnail = jpgMatches[0] || '';
       }
     }
 
