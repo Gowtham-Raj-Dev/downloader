@@ -140,11 +140,17 @@ export default function Header() {
                   YouTube Description Extractor
                 </Link>
                 <div className="h-px w-full bg-neutral-100 dark:bg-zinc-800/50 my-1"></div>
-                <Link href="/pinterest" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
+                <Link href="/pinterest/video" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
                   Pinterest Downloader
                 </Link>
-                <Link href="/pinterest/multi-url" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
+                <Link href="/pinterest/video/multi-url" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
                   Multi Pinterest Downloader
+                </Link>
+                <Link href="/pinterest/image" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
+                  Pinterest Image Downloader
+                </Link>
+                <Link href="/pinterest/image/multi-url" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
+                  Multi Pinterest Image Downloader
                 </Link>
               </div>
             </div>

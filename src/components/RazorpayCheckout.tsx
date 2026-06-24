@@ -5,12 +5,14 @@ import { Loader2, ShieldCheck } from 'lucide-react';
 
 interface RazorpayCheckoutProps {
   userEmail: string;
-  onSuccess: () => void;
-  variant?: 'card' | 'compact';
+  days: number;
+  amount: number;
+  onSuccess: (days: number, amount: number) => void;
+  variant?: 'card' | 'compact' | 'button';
   buttonClassName?: string;
 }
 
-export default function RazorpayCheckout({ userEmail, onSuccess, variant = 'card', buttonClassName }: RazorpayCheckoutProps) {
+export default function RazorpayCheckout({ userEmail, days, amount, onSuccess, variant = 'card', buttonClassName }: RazorpayCheckoutProps) {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const loadRazorpayScript = () => {
@@ -42,7 +44,7 @@ export default function RazorpayCheckout({ userEmail, onSuccess, variant = 'card
       const res = await fetch('/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: 29, currency: 'INR' }),
+        body: JSON.stringify({ amount: amount, currency: 'INR' }),
       });
 
       const data = await res.json();
@@ -58,7 +60,7 @@ export default function RazorpayCheckout({ userEmail, onSuccess, variant = 'card
         amount: order.amount,
         currency: order.currency,
         name: 'CodeLove Downloader',
-        description: '3-Days Premium Pass',
+        description: `${days}-Days VIP Pass`,
         order_id: order.id,
         handler: async function (response: unknown) {
           const res = response as { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string };
@@ -76,7 +78,7 @@ export default function RazorpayCheckout({ userEmail, onSuccess, variant = 'card
 
             const verifyData = await verifyRes.json();
             if (verifyData.success) {
-              onSuccess(); // Payment verified, unlock premium features!
+              onSuccess(days, amount); // Payment verified, unlock premium features!
             } else {
               alert('Payment verification failed!');
             }
@@ -126,14 +128,16 @@ export default function RazorpayCheckout({ userEmail, onSuccess, variant = 'card
           </>
         ) : variant === 'compact' ? (
           <span>Explore Now 🚀</span>
+        ) : variant === 'button' ? (
+          <span>Pay ₹{amount} Securely</span>
         ) : (
-          <span>Pay ₹29 Securely</span>
+          <span>Pay ₹{amount} Securely</span>
         )}
       </div>
     </button>
   );
 
-  if (variant === 'compact') {
+  if (variant === 'compact' || variant === 'button') {
     return buttonContent;
   }
 
@@ -144,7 +148,7 @@ export default function RazorpayCheckout({ userEmail, onSuccess, variant = 'card
       </div>
       <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-200">VIP Pass</h3>
       <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 mb-5">
-        Unlock unrestricted Batch downloads & VIP features for 3 full days.
+        Unlock unrestricted Batch downloads & VIP features for {days} full days.
       </p>
 
       {buttonContent}

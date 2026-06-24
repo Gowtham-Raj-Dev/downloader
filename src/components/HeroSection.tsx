@@ -15,15 +15,17 @@ interface HeroSectionProps {
   isLoading?: boolean;
   error?: string | null;
   isPremiumFeature?: boolean;
+  placeholder?: string;
 }
 
-export default function HeroSection({ onFetch, isLoading, error, isPremiumFeature = true }: HeroSectionProps) {
+export default function HeroSection({ onFetch, isLoading, error, isPremiumFeature = true, placeholder }: HeroSectionProps) {
   const pathname = usePathname();
   const isBatch = pathname?.includes('/multi-url');
   const basePath = isBatch ? pathname.replace('/multi-url', '') : pathname;
 
   const isYoutube = pathname?.includes('/youtube');
   const isPinterest = pathname?.includes('/pinterest');
+  const isPinterestImage = pathname?.includes('/pinterest/image');
 
   const [url, setUrl] = useReactState('');
   const [urlFields, setUrlFields] = useReactState<string[]>(['', '']); // 2 empty boxes by default
@@ -118,7 +120,7 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
           }`}
       >
         <Sparkles className="w-3.5 h-3.5" />
-        <span>Instantly download public videos & media</span>
+        <span>Instantly download public {isPinterestImage ? 'images' : 'videos & media'}</span>
       </motion.div>
 
       {/* Hero Headings */}
@@ -131,7 +133,7 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
         Free{' '}
         {isBatch ? 'Multiple ' : ''}
         <span className={isPinterest ? "shine-pinterest" : isYoutube ? "shine-youtube" : "shine-insta"}>
-          {isPinterest ? "Pinterest Video" : isYoutube ? "YouTube Video" : "Instagram Video"}{isBatch ? 's' : ''}
+          {isPinterest ? (isPinterestImage ? "Pinterest Image" : "Pinterest Video") : isYoutube ? "YouTube Video" : "Instagram Video"}{isBatch ? 's' : ''}
         </span>{' '}
         Downloader
       </motion.h1>
@@ -142,7 +144,7 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
         transition={{ duration: 0.6, delay: 0.2 }}
         className="text-base md:text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto mb-10 leading-relaxed font-normal"
       >
-        Paste any {isPinterest ? "Pinterest pin" : isYoutube ? "YouTube video" : "Instagram Reel or Video"} link and instantly fetch, play, and download your media.
+        Paste any {isPinterest ? "Pinterest pin" : isYoutube ? "YouTube video" : "Instagram Reel or Video"} link and instantly fetch, {isPinterestImage ? "view" : "play"}, and download your media.
       </motion.p>
 
       {error && (
@@ -197,7 +199,7 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder={`Paste ${isPinterest ? 'Pinterest' : isYoutube ? 'YouTube Shorts' : 'Instagram'} video or reel URL`}
+                placeholder={`Paste ${isPinterest ? (isPinterestImage ? 'Pinterest image or pin' : 'Pinterest video or reel') : isYoutube ? 'YouTube Shorts' : 'Instagram'} URL`}
                 className="w-full pl-11 pr-24 py-3.5 bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-instagram-pink/50 dark:focus:ring-instagram-orange/50 transition-all text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 dark:placeholder-neutral-600"
                 disabled={isLoading}
               />
@@ -221,7 +223,7 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
                   : 'bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange'
                 }`}
             >
-              <span>Fetch Videos</span>
+              <span>Fetch {isPinterestImage ? 'Images' : 'Videos'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
@@ -237,7 +239,7 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
             </div>
             <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-200 mb-2">Premium Feature Locked</h3>
             <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto mb-6">
-              Batch downloading multiple URLs at once is a premium feature. Upgrade to fetch multiple videos simultaneously with zero limits!
+              Batch downloading multiple URLs at once is a premium feature. Upgrade to fetch multiple {isPinterestImage ? 'images' : 'videos'} simultaneously with zero limits!
             </p>
             <Link
               href="/profile"
@@ -260,7 +262,7 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
                       type="text"
                       value={field}
                       onChange={(e) => handleFieldChange(index, e.target.value)}
-                      placeholder={`Paste ${isPinterest ? 'Pinterest' : isYoutube ? 'YouTube Shorts' : 'Instagram'} video URL #${index + 1}`}
+                      placeholder={`Paste ${isPinterest ? (isPinterestImage ? 'Pinterest image or pin' : 'Pinterest video or reel') : isYoutube ? 'YouTube Shorts' : 'Instagram'} URL #${index + 1}`}
                       className="w-full pl-10 pr-20 py-3 bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-instagram-pink/50 dark:focus:ring-instagram-orange/50 transition-all text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 dark:placeholder-neutral-600"
                       disabled={isLoading}
                     />
@@ -308,7 +310,7 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
                     : 'bg-gradient-to-r from-instagram-purple via-instagram-pink to-instagram-orange'
                   }`}
               >
-                <span>Fetch Videos</span>
+                <span>Fetch {isPinterestImage ? 'Images' : 'Videos'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -317,7 +319,7 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
 
         {/* Helper Note */}
         <div className="mt-4 text-xs text-neutral-500 dark:text-neutral-500">
-          <span>Supports public posts, reels, and video links.</span>
+          <span>Supports public posts, {isPinterestImage ? 'images, and pins' : 'reels, and video links'}.</span>
         </div>
       </motion.div>
     </div>

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
+
 
 export const dynamic = 'force-dynamic';
 
@@ -14,25 +14,40 @@ export async function GET(request: NextRequest) {
   try {
     console.log('Fetching Pinterest URL via API:', url);
     
-    const response = await axios.get(url, {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    const response = await fetch(url, {
+      method: 'GET',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
       },
-      timeout: 10000,
-      maxRedirects: 5,
+      redirect: 'follow',
+      cache: 'no-store',
+      signal: controller.signal
     });
+    
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+        throw new Error(`Failed! HTTP error! status: ${response.status}`);
+    }
+
+    const htmlData = await response.text();
 
     // Unescape HTML to handle escaped characters like \/
-    const unescapedHtml = response.data.replace(/\\(?:u002F|\/)/g, '/');
+    const unescapedHtml = htmlData.replace(/\\(?:u002F|\/)/g, '/');
 
     // 1. Try to extract from __PWS_DATA__ json if present
     let bestVideoUrl = '';
     let bestThumbnail = '';
     
     try {
-      const pwsDataMatch = response.data.match(/<script id="__PWS_DATA__" type="application\/json">(.+?)<\/script>/);
+      const pwsDataMatch = htmlData.match(/<script id="__PWS_DATA__" type="application\/json">(.+?)<\/script>/);
       if (pwsDataMatch) {
         const pwsData = JSON.parse(pwsDataMatch[1]);
         // Recursively search for video URLs in the JSON
@@ -40,7 +55,7 @@ export async function GET(request: NextRequest) {
         const findVideo = (obj: any) => {
           if (!obj) return;
           if (typeof obj === 'string') {
-            if (obj.startsWith('http') && (obj.includes('.mp4') || obj.includes('.m3u8')) && obj.includes('v.pinimg.com')) {
+            if (obj.startsWith('http') && (obj.includes('.mp4') || obj.includes('.m3u8')) && obj.includes('.pinimg.com')) {
               if (obj.includes('720p') || obj.includes('1080p') || obj.includes('V_720P')) {
                  bestVideoUrl = obj;
               } else if (!bestVideoUrl) {
@@ -77,8 +92,8 @@ export async function GET(request: NextRequest) {
       const mp4Matches = unescapedHtml.match(/https:\/\/[^\s"'<>]+\.(?:mp4|m3u8)/gi) || [];
       const jpgMatches = unescapedHtml.match(/https:\/\/[^\s"'<>]+\.jpg/gi) || [];
 
-      // Filter for v.pinimg.com which is their video CDN
-      const videoMatches = mp4Matches.filter((url: string) => url.includes('v.pinimg.com'));
+      // Filter for .pinimg.com which is their video CDN
+      const videoMatches = mp4Matches.filter((url: string) => url.includes('.pinimg.com'));
       const uniqueVideos: string[] = Array.from(new Set(videoMatches.length > 0 ? videoMatches : (mp4Matches as string[])));
 
       if (uniqueVideos.length > 0) {

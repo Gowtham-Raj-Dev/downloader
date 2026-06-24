@@ -36,6 +36,9 @@ export function useUserLimits() {
   }, []);
 
   const checkDailyLimit = async (type: 'single' | 'multi') => {
+    // Bypass all limits when testing locally
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') return true;
+
     if (isPremium) return true; // Premium has no hard limits
 
     // For Multi, if not premium, they can't use it

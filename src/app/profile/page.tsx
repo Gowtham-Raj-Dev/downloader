@@ -66,6 +66,8 @@ export default function ProfilePage() {
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [dailyCount, setDailyCount] = useState<number>(0);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [selectedDays, setSelectedDays] = useState(3);
 
   useEffect(() => {
     const fetchLimits = async () => {
@@ -167,12 +169,12 @@ export default function ProfilePage() {
     return () => clearInterval(interval);
   }, [userData]);
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (days: number, amount: number) => {
     if (!user) return;
 
-    const expiryDate = Date.now() + 3 * 24 * 60 * 60 * 1000;
+    const expiryDate = Date.now() + days * 24 * 60 * 60 * 1000;
     const userRef = doc(db, 'users', user.uid);
-    const amountPaid = 29;
+    const amountPaid = amount;
 
     await updateDoc(userRef, {
       isPremium: true,
@@ -383,12 +385,12 @@ export default function ProfilePage() {
               <div className="relative z-10">
                 <h4 className="text-white text-[13px] font-bold mb-1">You&apos;re on Free Plan</h4>
                 <p className="text-[11px] text-emerald-100/70 mb-3 leading-relaxed">Unlock unlimited access to all features and high-speed servers.</p>
-                <RazorpayCheckout
-                  userEmail={user.email || ''}
-                  onSuccess={handlePaymentSuccess}
-                  variant="compact"
-                  buttonClassName="w-full py-2 bg-white text-[#064e3b] font-bold text-xs rounded-lg hover:bg-neutral-100 transition-all shadow-lg cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-                />
+                <button
+                  onClick={() => setShowPurchaseModal(true)}
+                  className="w-full py-2 bg-white text-[#064e3b] font-bold text-xs rounded-lg hover:bg-neutral-100 transition-all shadow-lg cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  Explore Now 🚀
+                </button>
               </div>
             </div>
           )}
@@ -490,10 +492,10 @@ export default function ProfilePage() {
                    <div className="mt-1">
                      <div className="flex items-baseline gap-2">
                        <span className="text-3xl font-black text-neutral-900 dark:text-white">{dailyCount}</span>
-                       <span className="text-lg font-bold text-neutral-400">/ 100</span>
+                       <span className="text-lg font-bold text-neutral-400">/ 10</span>
                      </div>
                      <div className="w-full bg-neutral-100 dark:bg-neutral-800 rounded-full h-2 mt-3 overflow-hidden">
-                       <div className="bg-emerald-500 h-2 rounded-full transition-all" style={{ width: `${Math.min((dailyCount / 100) * 100, 100)}%` }}></div>
+                       <div className="bg-emerald-500 h-2 rounded-full transition-all" style={{ width: `${Math.min((dailyCount / 10) * 100, 100)}%` }}></div>
                      </div>
                    </div>
                  )}
@@ -632,6 +634,55 @@ export default function ProfilePage() {
       </div>
 
       {/* MODALS */}
+      {showPurchaseModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+          <div className="bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 max-w-sm w-full shadow-2xl relative">
+            <button onClick={() => setShowPurchaseModal(false)} className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 cursor-pointer">
+              <X className="w-5 h-5" />
+            </button>
+            <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-500 rounded-full flex items-center justify-center mb-4">
+              <Zap className="w-6 h-6" />
+            </div>
+            <h2 className="text-xl font-black text-neutral-900 dark:text-white mb-2">Custom VIP Pass</h2>
+            <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm mb-6">
+              Select how many days of VIP access you need. 1 Day is ₹10, and each additional day is just ₹9!
+            </p>
+            
+            <div className="flex items-center justify-between bg-neutral-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-neutral-200 dark:border-zinc-700 mb-6">
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Days</span>
+                <div className="flex items-center gap-3 mt-1">
+                  <button 
+                    onClick={() => setSelectedDays(Math.max(1, selectedDays - 1))}
+                    className="w-8 h-8 rounded-md bg-white dark:bg-zinc-800 border border-neutral-200 dark:border-zinc-700 flex items-center justify-center font-bold text-lg hover:bg-neutral-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+                  >-</button>
+                  <span className="text-xl font-black text-neutral-900 dark:text-white w-6 text-center">{selectedDays}</span>
+                  <button 
+                    onClick={() => setSelectedDays(selectedDays + 1)}
+                    className="w-8 h-8 rounded-md bg-white dark:bg-zinc-800 border border-neutral-200 dark:border-zinc-700 flex items-center justify-center font-bold text-lg hover:bg-neutral-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+                  >+</button>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Total</span>
+                <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">₹{10 + (selectedDays - 1) * 9}</p>
+              </div>
+            </div>
+
+            <RazorpayCheckout
+              userEmail={user.email || ''}
+              days={selectedDays}
+              amount={10 + (selectedDays - 1) * 9}
+              onSuccess={(d, a) => {
+                setShowPurchaseModal(false);
+                handlePaymentSuccess(d, a);
+              }}
+              variant="button"
+            />
+          </div>
+        </div>
+      )}
+
       {showSuccessModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
           <div className="bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">

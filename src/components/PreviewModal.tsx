@@ -82,10 +82,12 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
   const handleDownload = () => {
     if (!video) return;
     try {
-      const proxyUrl = `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}&download=1&filename=${video.type}_${video.id}.mp4`;
+      const isImage = video.duration === 'Image';
+      const ext = isImage ? 'jpg' : 'mp4';
+      const proxyUrl = `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}&download=1&filename=${video.type}_${video.id}.${ext}`;
       const link = document.createElement('a');
       link.href = proxyUrl;
-      link.download = `${video.type}_${video.id}.mp4`;
+      link.download = `${video.type}_${video.id}.${ext}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -94,6 +96,9 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
       window.location.assign(video.videoUrl);
     }
   };
+
+  const isImage = video?.duration === 'Image';
+
 
   return (
     <AnimatePresence>
@@ -132,7 +137,7 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
                 </div>
                 <h4 className="text-sm font-bold text-neutral-200 mb-1">Preview Playback Unavailable</h4>
                 <p className="text-xs text-neutral-500 max-w-xs leading-relaxed mb-4">
-                  Inline media playback is not supported by your browser or the video source is offline.
+                  Inline media playback is not supported by your browser or the media source is offline.
                 </p>
                 <button
                   onClick={handleDownload}
@@ -142,6 +147,15 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
                   <span>Download to View</span>
                 </button>
               </div>
+            ) : isImage ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={video.videoUrl}
+                alt="Media Preview"
+                className="w-full h-full object-contain"
+                referrerPolicy="no-referrer"
+                onError={() => setVideoError(true)}
+              />
             ) : (
               <video
                 ref={videoRef}
@@ -160,24 +174,26 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
             {/* Video Controls overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
 
-            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-10 pointer-events-auto">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={togglePlay}
-                  className="p-2.5 rounded-full bg-white text-black hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-md"
-                  aria-label={isPlaying ? 'Pause' : 'Play'}
-                >
-                  {isPlaying ? <Pause className="w-4 h-4 fill-black" /> : <Play className="w-4 h-4 fill-black" />}
-                </button>
-                <button
-                  onClick={toggleMute}
-                  className="p-2.5 rounded-full bg-zinc-800/80 text-white hover:bg-zinc-700 transition-colors cursor-pointer"
-                  aria-label={isMuted ? 'Unmute' : 'Mute'}
-                >
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </button>
+            {!isImage && (
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-10 pointer-events-auto">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={togglePlay}
+                    className="p-2.5 rounded-full bg-white text-black hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-md"
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                  >
+                    {isPlaying ? <Pause className="w-4 h-4 fill-black" /> : <Play className="w-4 h-4 fill-black" />}
+                  </button>
+                  <button
+                    onClick={toggleMute}
+                    className="p-2.5 rounded-full bg-zinc-800/80 text-white hover:bg-zinc-700 transition-colors cursor-pointer"
+                    aria-label={isMuted ? 'Unmute' : 'Mute'}
+                  >
+                    {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Sidebar Info Panel */}
@@ -213,10 +229,10 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
                   <span>Technical Info</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-1.5 text-[10px] font-mono text-neutral-400">
-                  <span>Format: MP4</span>
-                  <span>Audio: AAC Stereo</span>
-                  <span>Video: H.264</span>
-                  <span>FPS: 30 fps</span>
+                  <span>Format: {isImage ? 'JPG/PNG' : 'MP4'}</span>
+                  {!isImage && <span>Audio: AAC Stereo</span>}
+                  {!isImage && <span>Video: H.264</span>}
+                  {!isImage && <span>FPS: 30 fps</span>}
                 </div>
               </div>
             </div>
@@ -273,7 +289,7 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
                 ) : (
                   <>
                     <Download className="w-4 h-4" />
-                    <span>Download MP4 Video</span>
+                    <span>Download {isImage ? 'Image' : 'MP4 Video'}</span>
                   </>
                 )}
               </button>
