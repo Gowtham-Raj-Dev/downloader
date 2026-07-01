@@ -726,11 +726,11 @@ export default function YoutubePage() {
                         </a>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 mt-4">
+                      <div className="flex flex-col gap-2 mt-4">
                         <button
                           onClick={() => handleDirectDownload('720')}
                           disabled={isDownloading}
-                          className="w-full col-span-2 py-2.5 rounded-button bg-gradient-to-r from-red-600 to-rose-500 text-white font-bold text-[12px] flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-md hover:brightness-105 transition-all disabled:opacity-50"
+                          className="w-full py-2.5 rounded-button bg-gradient-to-r from-red-600 to-rose-500 text-white font-bold text-[12px] flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-md hover:brightness-105 transition-all disabled:opacity-50"
                         >
                           <div className="flex items-center gap-1.5">
                             {downloadingQuality === '720' ? (
@@ -758,7 +758,6 @@ export default function YoutubePage() {
                           </div>
                           <span className="text-[9px] font-medium opacity-80">(Perfect Duration, Low Quality)</span>
                         </button>
-
                       </div>
                     </div>
 
