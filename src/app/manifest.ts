@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'MediaExplorer Free Video Downloader',
-    short_name: 'MediaExplorer',
+    name: 'CodeLove Free Video Downloader',
+    short_name: 'CodeLove',
     description: 'Best free video downloader online. Fast, responsive, and free insta downloader and YouTube downloader tool.',
     start_url: '/',
     display: 'standalone',

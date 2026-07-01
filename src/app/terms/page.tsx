@@ -2,8 +2,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export const metadata = {
-  title: 'Terms & Conditions | MediaExplorer',
-  description: 'Terms and Conditions for using MediaExplorer hub.',
+  title: 'Terms & Conditions | CodeLove',
+  description: 'Terms and Conditions for using CodeLove hub.',
 };
 
 export default function TermsConditionsPage() {
@@ -21,21 +21,21 @@ export default function TermsConditionsPage() {
             <section>
               <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">1. Acceptance of Terms</h2>
               <p>
-                By accessing and using MediaExplorer, you agree to be bound by these Terms and Conditions. If you disagree with any part of these terms, you may not access the service.
+                By accessing and using CodeLove, you agree to be bound by these Terms and Conditions. If you disagree with any part of these terms, you may not access the service.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">2. Service Usage and Restrictions</h2>
               <p>
-                MediaExplorer provides a tool to download publicly available media. You agree to use this service only for personal, non-commercial purposes. You are strictly prohibited from using our service to download copyrighted material without the explicit permission of the copyright owner.
+                CodeLove provides a tool to download publicly available media. You agree to use this service only for personal, non-commercial purposes. You are strictly prohibited from using our service to download copyrighted material without the explicit permission of the copyright owner.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">3. Disclaimer of Liability</h2>
               <p>
-                The service is provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis. MediaExplorer makes no warranties, expressed or implied, regarding the availability, accuracy, or reliability of the service. We shall not be liable for any damages arising from your use or inability to use the service.
+                The service is provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis. CodeLove makes no warranties, expressed or implied, regarding the availability, accuracy, or reliability of the service. We shall not be liable for any damages arising from your use or inability to use the service.
               </p>
             </section>
 

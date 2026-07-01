@@ -25,9 +25,9 @@ export const metadata: Metadata = {
     "batch video download",
     "video download online free"
   ],
-  authors: [{ name: "MediaExplorer Team", url: "https://downloader.codelove.in" }],
-  creator: "MediaExplorer",
-  publisher: "MediaExplorer",
+  authors: [{ name: "CodeLove Team", url: "https://downloader.codelove.in" }],
+  creator: "CodeLove",
+  publisher: "CodeLove",
   formatDetection: {
     email: false,
     address: false,
@@ -45,13 +45,13 @@ export const metadata: Metadata = {
     url: "https://downloader.codelove.in/",
     title: "Free Video Downloader - Insta Downloader & YouTube Loader",
     description: "Best free video downloader online. Fast, responsive, and free insta downloader and YouTube downloader tool. Download public Instagram videos, reels, and YouTube shorts instantly.",
-    siteName: "MediaExplorer Downloader",
+    siteName: "CodeLove Downloader",
   },
   twitter: {
     card: "summary_large_image",
     title: "Free Video Downloader - Insta Downloader & YouTube Loader",
     description: "Best free video downloader online. Fast, responsive, and free insta downloader and YouTube downloader tool.",
-    creator: "@mediaexplorer",
+    creator: "@codelove",
   },
   robots: {
     index: true,
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "MediaExplorer Free Video Downloader",
+  "name": "CodeLove Free Video Downloader",
   "url": "https://downloader.codelove.in",
   "description": "Best free video downloader online. Fast, responsive, and free insta downloader and YouTube downloader tool.",
   "potentialAction": {

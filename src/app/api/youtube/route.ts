@@ -65,40 +65,54 @@ export async function GET(request: NextRequest) {
       console.warn('Failed to extract exact stats from YT source:', e);
     }
 
-    // 2. Fetch direct download link from Cobalt instances
+    // 2. Fetch direct download link
     let downloadUrl = null;
     const errorMsg = 'Failed to extract download link from all Cobalt instances.';
 
-    for (const instance of COBALT_INSTANCES) {
-      try {
-        console.log(`Trying Cobalt instance: ${instance} for URL: ${url} (quality: ${quality})`);
-        const res = await fetch(instance, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            url: url,
-            videoQuality: quality, // Selected quality format (e.g. 1080, 720, 480, 360, 240)
-            alwaysProxy: false
-          }),
-          signal: AbortSignal.timeout(6000) // 6 second timeout per instance
-        });
+    const isHighQuality = ['1080', '1440', '2160', '4320', 'max'].includes(quality);
 
-        if (res.ok) {
-          const json = await res.json();
-          if (json && json.url) {
-            downloadUrl = json.url;
-            console.log(`Success with Cobalt instance ${instance}! URL: ${downloadUrl}`);
-            break;
+    // For 720p and below, we use our yt-dlp proxy streamer.
+    // This provides the TRUE native 720p file (itag 22) with intact duration metadata,
+    // bypassing YouTube's IP lock by streaming through our backend.
+    if (!isHighQuality) {
+      downloadUrl = `/api/youtube/proxy?url=${encodeURIComponent(url)}`;
+      console.log(`Using yt-dlp proxy stream for standard quality: ${downloadUrl}`);
+    }
+
+    // Use Cobalt for 1080p+ or if btch-downloader fails
+    if (!downloadUrl) {
+      for (const instance of COBALT_INSTANCES) {
+        try {
+          console.log(`Trying Cobalt instance: ${instance} for URL: ${url} (quality: ${quality})`);
+          const res = await fetch(instance, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              url: url,
+              videoQuality: quality,
+              youtubeVideoCodec: "h264",
+              alwaysProxy: true
+            }),
+            signal: AbortSignal.timeout(6000) // 6 second timeout per instance
+          });
+
+          if (res.ok) {
+            const json = await res.json();
+            if (json && json.url) {
+              downloadUrl = json.url;
+              console.log(`Success with Cobalt instance ${instance}! URL: ${downloadUrl}`);
+              break;
+            }
+          } else {
+            const errBody = await res.text();
+            console.warn(`Cobalt instance ${instance} returned status ${res.status}: ${errBody}`);
           }
-        } else {
-          const errBody = await res.text();
-          console.warn(`Cobalt instance ${instance} returned status ${res.status}: ${errBody}`);
+        } catch (instErr) {
+          console.warn(`Error connecting to Cobalt instance ${instance}:`, instErr instanceof Error ? instErr.message : instErr);
         }
-      } catch (instErr) {
-        console.warn(`Error connecting to Cobalt instance ${instance}:`, instErr instanceof Error ? instErr.message : instErr);
       }
     }
 

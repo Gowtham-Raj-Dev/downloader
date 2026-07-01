@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Clipboard, ArrowRight, Sparkles, Link as LinkIcon, Plus, Trash2, Lock } from 'lucide-react';
@@ -17,14 +17,29 @@ interface YoutubeHeroSectionProps {
 
 export default function YoutubeHeroSection({ onFetch, isLoading, error }: YoutubeHeroSectionProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const isBatch = pathname?.endsWith('/multi-url');
   const basePath = isBatch ? pathname.replace('/multi-url', '') : pathname;
 
   const [url, setUrl] = useState('');
   const [urlFields, setUrlFields] = useState<string[]>(['', '']);
+  const [hasAutoFetched, setHasAutoFetched] = useState(false);
 
   const [isPremium, setIsPremium] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+
+  useEffect(() => {
+    const urlParam = searchParams?.get('url');
+    if (urlParam && !isBatch && !hasAutoFetched) {
+      setUrl(urlParam);
+      onFetch([urlParam], 'shorts');
+      setHasAutoFetched(true);
+      
+      // Optional: Clear URL param to prevent re-fetching on page refresh
+      // router.replace(basePath || '/youtube', { scroll: false });
+    }
+  }, [searchParams, isBatch, hasAutoFetched, onFetch, basePath, router]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {

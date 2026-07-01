@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@distube/ytdl-core": "^4.16.12",
+    "@jerrycoder/instagram-api": "^2.5.9",
     "@myno_21/pinterest-scraper": "^1.0.4",
+    "@sasmeee/igdl": "^0.0.1-security",
     "axios": "^1.18.0",
-    "btch-downloader": "^6.0.32",
+    "btch-downloader": "^6.0.37",
     "clsx": "^2.1.1",
     "ffprobe-static": "^3.1.0",
     "firebase": "^12.14.0",
@@ -20,11 +22,14 @@
     "instagram-url-direct": "^2.0.7",
     "jszip": "^3.10.1",
     "lucide-react": "^1.17.0",
+    "moov-faststart": "^1.0.4",
     "next": "15.5.19",
+    "play-dl": "^1.9.7",
     "razorpay": "^2.9.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "tailwind-merge": "^3.6.0"
+    "tailwind-merge": "^3.6.0",
+    "youtube-dl-exec": "^3.1.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

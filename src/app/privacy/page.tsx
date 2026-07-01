@@ -2,8 +2,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export const metadata = {
-  title: 'Privacy Policy | MediaExplorer',
-  description: 'Privacy Policy for MediaExplorer hub.',
+  title: 'Privacy Policy | CodeLove',
+  description: 'Privacy Policy for CodeLove hub.',
 };
 
 export default function PrivacyPolicyPage() {
@@ -21,7 +21,7 @@ export default function PrivacyPolicyPage() {
             <section>
               <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">1. Information We Collect</h2>
               <p>
-                MediaExplorer is designed to be a frictionless tool. We do not require account registration, and we do not actively collect personally identifiable information (PII) such as your name, email address, or phone number. We only collect anonymous usage data to improve our service performance.
+                CodeLove is designed to be a frictionless tool. We do not require account registration, and we do not actively collect personally identifiable information (PII) such as your name, email address, or phone number. We only collect anonymous usage data to improve our service performance.
               </p>
             </section>
 

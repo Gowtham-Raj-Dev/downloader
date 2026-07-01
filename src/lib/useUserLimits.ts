@@ -63,7 +63,7 @@ export function useUserLimits() {
     const key = `daily_downloads_${today}`;
     const count = parseInt(localStorage.getItem(key) || '0');
 
-    const limit = isLoggedIn ? 100 : 20;
+    const limit = isLoggedIn ? 9999 : 9999;
 
     return count < limit;
   };

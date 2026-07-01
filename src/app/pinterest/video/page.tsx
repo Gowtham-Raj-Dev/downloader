@@ -317,7 +317,7 @@ export default function PinterestPage() {
                   <div className={`relative flex-1 bg-black flex items-center justify-center overflow-hidden max-h-[500px] ${singleVideo.type === 'reel' ? 'aspect-[4/5]' : 'aspect-square w-full'}`}>
                     <video
                       ref={videoRef}
-                      src={singleVideo.videoUrl}
+                      src={singleVideo.videoUrl.startsWith('http') && !singleVideo.videoUrl.includes('/api/video/stream') ? `/api/video/stream?url=${encodeURIComponent(singleVideo.videoUrl)}` : singleVideo.videoUrl}
                       loop
                       playsInline
                       className="w-full h-full object-contain cursor-pointer"

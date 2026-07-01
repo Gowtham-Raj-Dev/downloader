@@ -14,6 +14,7 @@ import DownloadAllModal from '@/components/DownloadAllModal';
 import LimitExceededModal from '@/components/LimitExceededModal';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { Suspense } from 'react';
 import {
   isYoutubeVideoUrl,
   extractYoutubeId,
@@ -131,7 +132,7 @@ export default function YoutubePage() {
     }
   };
 
-  const [selectedQuality, setSelectedQuality] = useState<string>('1080');
+  const [selectedQuality, setSelectedQuality] = useState<string>('720');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isChangingQuality, setIsChangingQuality] = useState<boolean>(false);
 
@@ -230,7 +231,7 @@ export default function YoutubePage() {
           await new Promise(r => setTimeout(r, 1500 * (index - 199)));
         }
 
-        const defaultQuality = mediaType === 'video' ? '720' : '1080';
+        const defaultQuality = '720'; // Hardcode default to 720 to bypass 0:00 duration bug on 1080p
         const response = await fetch(`/api/youtube?url=${encodeURIComponent(url)}&quality=${defaultQuality}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch YouTube link: ${url}`);
@@ -336,20 +337,15 @@ export default function YoutubePage() {
         const result = await response.json();
         if (!result.success || !result.data?.videoUrl) throw new Error('Video extraction failed');
 
-        const fileResponse = await fetch(result.data.videoUrl);
-        if (!fileResponse.ok) throw new Error('Failed to fetch file blob');
-        const blob = await fileResponse.blob();
-
-        const blobUrl = URL.createObjectURL(blob);
+        // Native direct download
         const link = document.createElement('a');
-        link.href = blobUrl;
-
+        link.href = result.data.videoUrl;
+        link.target = '_blank';
         const cleanTitle = (video.title || `youtube_video_${i + 1}`).replace(/[^a-z0-9]/gi, '_').toLowerCase();
         link.setAttribute('download', `${cleanTitle}.mp4`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
       } catch (err) {
         console.error(`Failed to download video ${video.id}:`, err);
         // Fallback
@@ -402,17 +398,42 @@ export default function YoutubePage() {
     }
   };
 
-  // Direct download that fetches quality and opens URL to prevent 0B blob issues
+  // Direct download that fetches the full Blob to ensure correct file metadata is written on mobile
   const handleDirectDownload = async (quality: string) => {
     if (!singleVideo) return;
     setIsDownloading(true);
     setDownloadingQuality(quality);
-    setDownloadProgress(50); // visual indicator
+    setDownloadProgress(20); // visual indicator
     try {
       const response = await fetch(`/api/youtube?url=${encodeURIComponent(singleVideo.youtubeUrl)}&quality=${quality}`);
       const result = await response.json();
       if (result.success && result.data?.videoUrl) {
-        window.location.assign(result.data.videoUrl);
+        setDownloadProgress(60);
+        
+        // We fetch the video as a Blob first so we can track when it's fully downloaded.
+        // This keeps the "Downloading..." spinner active until the file is completely saved to memory.
+        const fileResponse = await fetch(result.data.videoUrl);
+        
+        if (!fileResponse.ok) {
+          throw new Error('Network response was not ok');
+        }
+        
+        const blob = await fileResponse.blob();
+        setDownloadProgress(90);
+        
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        
+        const cleanTitle = (singleVideo.title || 'youtube_video').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        link.setAttribute('download', `${cleanTitle}.mp4`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up the object URL to free memory
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+        
         trackUserAction('youtube', 'single', 'download', 1);
       } else {
         alert('Failed to extract ' + quality + 'p video.');
@@ -462,7 +483,9 @@ export default function YoutubePage() {
                 transition={{ duration: 0.4 }}
                 className="w-full"
               >
-                <YoutubeHeroSection onFetch={handleFetchProfile} isLoading={isLoading} error={error} />
+                <Suspense fallback={<div className="w-full text-center py-20"><Loader2 className="w-8 h-8 animate-spin mx-auto text-red-500 mb-4"/><p className="text-sm text-neutral-500 font-medium">Loading...</p></div>}>
+                  <YoutubeHeroSection onFetch={handleFetchProfile} isLoading={isLoading} error={error} />
+                </Suspense>
 
                 {/* Feature Highlights */}
                 <div className="max-w-4xl mx-auto px-4 mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -538,8 +561,7 @@ export default function YoutubePage() {
                       disabled={isZipping}
                       className="px-3 py-2 pr-8 text-xs font-bold rounded-button bg-neutral-100 dark:bg-neutral-900/80 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 cursor-pointer outline-none focus:ring-2 focus:ring-red-500/50 transition-all text-center shadow-sm"
                     >
-                      <option value="1080">1080p MP4</option>
-                      <option value="720">720p MP4</option>
+                      <option value="720">720p HD MP4</option>
                       <option value="480">480p MP4</option>
                       <option value="360">360p MP4</option>
                     </select>
@@ -715,24 +737,9 @@ export default function YoutubePage() {
 
                       <div className="grid grid-cols-2 gap-2 mt-4">
                         <button
-                          onClick={() => handleDirectDownload('1080')}
-                          disabled={isDownloading}
-                          className="w-full py-2 rounded-button bg-gradient-to-r from-red-600 to-rose-500 text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-md hover:brightness-105 transition-all disabled:opacity-50"
-                        >
-                          <div className="flex items-center gap-1.5">
-                            {downloadingQuality === '1080' ? (
-                              <svg className="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            ) : (
-                              <Download className="w-3.5 h-3.5" />
-                            )}
-                            <span>{downloadingQuality === '1080' ? 'Downloading...' : '1080p MP4'}</span>
-                          </div>
-                          <span className="text-[9px] font-medium opacity-80">{displayDuration} • {getEstimatedSize(displayDuration, '1080', singleVideo.sizeMb)}</span>
-                        </button>
-                        <button
                           onClick={() => handleDirectDownload('720')}
                           disabled={isDownloading}
-                          className="w-full py-2 rounded-button bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-md hover:brightness-105 transition-all disabled:opacity-50"
+                          className="w-full col-span-2 py-2.5 rounded-button bg-gradient-to-r from-red-600 to-rose-500 text-white font-bold text-[12px] flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-md hover:brightness-105 transition-all disabled:opacity-50"
                         >
                           <div className="flex items-center gap-1.5">
                             {downloadingQuality === '720' ? (
@@ -740,29 +747,15 @@ export default function YoutubePage() {
                             ) : (
                               <Download className="w-3.5 h-3.5" />
                             )}
-                            <span>{downloadingQuality === '720' ? 'Downloading...' : '720p MP4'}</span>
+                            <span>{downloadingQuality === '720' ? 'Downloading...' : '720p HD MP4'}</span>
                           </div>
-                          <span className="text-[9px] font-medium opacity-80">{displayDuration} • {getEstimatedSize(displayDuration, '720', singleVideo.sizeMb)}</span>
+                          <span className="text-[9px] font-medium opacity-80">(Perfect Mobile Duration)</span>
                         </button>
-                        <button
-                          onClick={() => handleDirectDownload('480')}
-                          disabled={isDownloading}
-                          className="w-full py-2 rounded-button bg-neutral-800 text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-md hover:bg-neutral-700 transition-all disabled:opacity-50"
-                        >
-                          <div className="flex items-center gap-1.5">
-                            {downloadingQuality === '480' ? (
-                              <svg className="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            ) : (
-                              <Download className="w-3.5 h-3.5" />
-                            )}
-                            <span>{downloadingQuality === '480' ? 'Downloading...' : '480p MP4'}</span>
-                          </div>
-                          <span className="text-[9px] font-medium text-neutral-300">{displayDuration} • {getEstimatedSize(displayDuration, '480', singleVideo.sizeMb)}</span>
-                        </button>
+                        
                         <button
                           onClick={() => handleDirectDownload('360')}
                           disabled={isDownloading}
-                          className="w-full py-2 rounded-button bg-neutral-800 text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-md hover:bg-neutral-700 transition-all disabled:opacity-50"
+                          className="w-full py-2.5 rounded-button bg-neutral-800 text-white font-bold text-[12px] flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-md hover:bg-neutral-700 transition-all disabled:opacity-50"
                         >
                           <div className="flex items-center gap-1.5">
                             {downloadingQuality === '360' ? (
@@ -770,10 +763,11 @@ export default function YoutubePage() {
                             ) : (
                               <Download className="w-3.5 h-3.5" />
                             )}
-                            <span>{downloadingQuality === '360' ? 'Downloading...' : '360p MP4'}</span>
+                            <span>{downloadingQuality === '360' ? 'Downloading...' : 'Mobile Compatible 360p'}</span>
                           </div>
-                          <span className="text-[9px] font-medium text-neutral-300">{displayDuration} • {getEstimatedSize(displayDuration, '360', singleVideo.sizeMb)}</span>
+                          <span className="text-[9px] font-medium opacity-80">(Perfect Duration, Low Quality)</span>
                         </button>
+
                       </div>
                     </div>
 

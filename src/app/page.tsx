@@ -117,7 +117,7 @@ export default function HomePage() {
                 "name": "Can I download private Instagram posts or members-only videos?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "No, this tool respects content creators' privacy and security boundaries. MediaExplorer is designed to download publicly available media only."
+                  "text": "No, this tool respects content creators' privacy and security boundaries. CodeLove is designed to download publicly available media only."
                 }
               },
               {
@@ -358,7 +358,7 @@ export default function HomePage() {
             Frequently Asked Questions
           </h2>
           <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-8 text-center sm:text-left">
-            Quick answers to common questions about using MediaExplorer downloader tool.
+            Quick answers to common questions about using CodeLove downloader tool.
           </p>
 
           <div className="space-y-4">
@@ -389,7 +389,7 @@ export default function HomePage() {
                 <span className="ml-1.5 transition duration-300 group-open:-rotate-180 shrink-0">👇</span>
               </summary>
               <p className="mt-3 text-xs text-neutral-500 dark:text-neutral-500 leading-relaxed">
-                No, this tool respects content creators&apos; privacy and security boundaries. MediaExplorer is designed to download publicly available media only. Private profile items or restricted age-locked videos cannot be fetched.
+                No, this tool respects content creators&apos; privacy and security boundaries. CodeLove is designed to download publicly available media only. Private profile items or restricted age-locked videos cannot be fetched.
               </p>
             </details>
 

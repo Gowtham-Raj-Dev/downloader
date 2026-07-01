@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
 
-export const alt = 'MediaExplorer Free Video Downloader';
+export const alt = 'CodeLove Free Video Downloader';
 export const size = {
   width: 1200,
   height: 630,
@@ -42,7 +42,7 @@ export default function Image() {
           </svg>
         </div>
         <div style={{ fontSize: '72px', fontWeight: 'bold', textAlign: 'center', fontFamily: 'sans-serif' }}>
-          MediaExplorer Hub
+          CodeLove Hub
         </div>
         <div style={{ fontSize: '36px', fontWeight: 'normal', textAlign: 'center', marginTop: '20px', fontFamily: 'sans-serif' }}>
           Free Video Downloader & Manager

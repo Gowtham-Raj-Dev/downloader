@@ -162,11 +162,13 @@ export default function InstagramPage() {
           ? `/api/video/stream?url=${encodeURIComponent(media.thumbnail)}`
           : '';
 
+        const isImage = media.is_image || false;
+
         return {
           id: `${shortcode}_${randomId}`,
           thumbnail: proxiedThumbnail,
           videoUrl: media.url || '',
-          duration: media.duration_s ? `${Math.floor(media.duration_s / 60)}:${String(Math.round(media.duration_s % 60)).padStart(2, '0')}` : '0:15',
+          duration: isImage ? 'Image' : (media.duration_s ? `${Math.floor(media.duration_s / 60)}:${String(Math.round(media.duration_s % 60)).padStart(2, '0')}` : '0:15'),
           views: media.video_view_count || 0,
           likes: postInfo.likes || 0,
           comments: 0,
@@ -230,10 +232,12 @@ export default function InstagramPage() {
     for (let i = 0; i < videosToDownload.length; i++) {
       const video = videosToDownload[i];
       try {
-        const proxyUrl = `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}&download=1&filename=instagram_video_${i + 1}.mp4`;
+        const isImage = video.duration === 'Image';
+        const ext = isImage ? 'jpg' : 'mp4';
+        const proxyUrl = `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}&download=1&filename=instagram_media_${i + 1}.${ext}`;
         const link = document.createElement('a');
         link.href = proxyUrl;
-        link.download = `instagram_video_${i + 1}.mp4`;
+        link.download = `instagram_media_${i + 1}.${ext}`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -289,10 +293,12 @@ export default function InstagramPage() {
 
   const handleDownloadVideo = (video: VideoItem) => {
     try {
-      const proxyUrl = `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}&download=1&filename=instagram_video_${video.id}.mp4`;
+      const isImage = video.duration === 'Image';
+      const ext = isImage ? 'jpg' : 'mp4';
+      const proxyUrl = `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}&download=1&filename=instagram_video_${video.id}.${ext}`;
       const link = document.createElement('a');
       link.href = proxyUrl;
-      link.download = `instagram_video_${video.id}.mp4`;
+      link.download = `instagram_video_${video.id}.${ext}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -465,17 +471,26 @@ export default function InstagramPage() {
 
                   {/* Left: Video Player */}
                   <div className={`relative flex-1 bg-black flex items-center justify-center overflow-hidden max-h-[500px] ${singleVideo.type === 'reel' ? 'aspect-[4/5]' : 'aspect-square w-full'}`}>
-                    <video
-                      ref={videoRef}
-                      src={singleVideo.videoUrl}
-                      loop
-                      playsInline
-                      className="w-full h-full object-contain cursor-pointer"
-                      onClick={togglePlaySingle}
-                      onPlay={() => setIsPlaying(true)}
-                      onPause={() => setIsPlaying(false)}
-                      {...({ referrerPolicy: "no-referrer" } as React.HTMLProps<HTMLVideoElement>)}
-                    />
+                    {singleVideo.duration === 'Image' ? (
+                      <img
+                        src={singleVideo.videoUrl.startsWith('http') ? `/api/video/stream?url=${encodeURIComponent(singleVideo.videoUrl)}` : singleVideo.videoUrl}
+                        alt="Media Preview"
+                        className="w-full h-full object-contain"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <video
+                        ref={videoRef}
+                        src={singleVideo.videoUrl.startsWith('http') ? `/api/video/stream?url=${encodeURIComponent(singleVideo.videoUrl)}` : singleVideo.videoUrl}
+                        loop
+                        playsInline
+                        className="w-full h-full object-contain cursor-pointer"
+                        onClick={togglePlaySingle}
+                        onPlay={() => setIsPlaying(true)}
+                        onPause={() => setIsPlaying(false)}
+                        {...({ referrerPolicy: "no-referrer" } as React.HTMLProps<HTMLVideoElement>)}
+                      />
+                    )}
                     {/* Dark overlay & play button */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none" />
 
@@ -578,7 +593,7 @@ export default function InstagramPage() {
                         ) : (
                           <>
                             <Download className="w-4 h-4" />
-                            <span>Download MP4 Video</span>
+                            <span>Download {singleVideo.duration === 'Image' ? 'Image' : 'MP4 Video'}</span>
                           </>
                         )}
                       </button>

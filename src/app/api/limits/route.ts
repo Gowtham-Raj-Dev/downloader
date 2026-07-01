@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       console.warn('Firebase read error for IP limits (possibly rules), falling back to 0', dbErr);
     }
 
-    const limit = isLoggedIn ? 100 : 20;
+    const limit = isLoggedIn ? 9999 : 9999;
 
     if (action === 'check') {
       return NextResponse.json({ 

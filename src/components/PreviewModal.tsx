@@ -150,7 +150,7 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
             ) : isImage ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
-                src={video.videoUrl}
+                src={video.videoUrl.startsWith('http') && !video.videoUrl.includes('/api/video/stream') && !video.videoUrl.includes('/api/youtube/proxy') ? `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}` : video.videoUrl}
                 alt="Media Preview"
                 className="w-full h-full object-contain"
                 referrerPolicy="no-referrer"
@@ -159,7 +159,7 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
             ) : (
               <video
                 ref={videoRef}
-                src={video.videoUrl}
+                src={video.videoUrl.startsWith('http') && !video.videoUrl.includes('/api/video/stream') && !video.videoUrl.includes('/api/youtube/proxy') ? `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}` : video.videoUrl}
                 loop
                 playsInline
                 className="w-full h-full object-contain cursor-pointer"

@@ -278,7 +278,7 @@ export default function PinterestImagePage() {
                   <div className={`relative flex-1 bg-black flex items-center justify-center overflow-hidden max-h-[500px] ${singleVideo.type === 'reel' ? 'aspect-[4/5]' : 'aspect-square w-full'}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={singleVideo.videoUrl}
+                      src={singleVideo.videoUrl.startsWith('http') && !singleVideo.videoUrl.includes('/api/video/stream') ? `/api/video/stream?url=${encodeURIComponent(singleVideo.videoUrl)}` : singleVideo.videoUrl}
                       alt="Pinterest Preview"
                       className="w-full h-full object-contain"
                       referrerPolicy="no-referrer"
