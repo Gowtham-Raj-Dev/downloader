@@ -124,7 +124,7 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-red-600/10 to-rose-500/10 border border-red-500/20 text-red-600 dark:text-red-400 mb-6"
       >
         <Sparkles className="w-3.5 h-3.5 shrink-0" />
-        <span className="text-center">Instantly download YouTube Shorts only</span>
+        <span className="text-center">Instantly download YouTube Videos & Shorts</span>
       </motion.div>
 
       {/* Hero Headings */}
@@ -137,7 +137,7 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
         Free{' '}
         {isBatch ? 'Multiple ' : ''}
         <span className="shine-youtube">
-          YouTube Shorts
+          YouTube Video
         </span>{' '}
         Downloader
       </motion.h1>
@@ -148,7 +148,7 @@ export default function YoutubeHeroSection({ onFetch, isLoading, error }: Youtub
         transition={{ duration: 0.6, delay: 0.2 }}
         className="text-base md:text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto mb-10 leading-relaxed font-normal"
       >
-        Paste any YouTube Shorts link and instantly fetch, play, and download your media. Note: Normal YouTube Videos are currently not supported due to server limits.
+        Paste any YouTube Video or Shorts link and instantly fetch, play, and download your media.
       </motion.p>
 
       {error && (

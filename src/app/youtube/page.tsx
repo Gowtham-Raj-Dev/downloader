@@ -184,17 +184,8 @@ export default function YoutubePage() {
     // Identify video URLs
     let videoUrls = inputs.filter(input => isYoutubeVideoUrl(input));
 
-    // STRICTLY enforce shorts only
-    const nonShortUrls = videoUrls.filter(url => !url.toLowerCase().includes('/shorts/'));
-    if (nonShortUrls.length > 0) {
-      setError('Normal YouTube Videos are not supported due to server limits. Please paste only YouTube Shorts links.');
-      setIsLoading(false);
-      setActiveUsername(null);
-      return;
-    }
-
     if (videoUrls.length === 0) {
-      setError('Invalid YouTube Shorts URL. Please enter a valid Shorts link.');
+      setError('Invalid YouTube URL. Please enter a valid YouTube video or Shorts link.');
       setIsLoading(false);
       setActiveUsername(null);
       return;
