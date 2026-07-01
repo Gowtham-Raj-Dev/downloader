@@ -13,6 +13,7 @@ const FALLBACK_COBALT_INSTANCES = [
 ];
 
 // Helper to decode base64url JWT payload from snapcdn URLs
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function decodeJwtPayload(token: string): any {
   try {
     const parts = token.split('.');
