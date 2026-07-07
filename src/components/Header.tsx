@@ -41,7 +41,7 @@ export default function Header() {
       <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-y-4 md:gap-y-0">
 
         {/* Brand / Logo */}
-        <div className="flex items-center">
+        <div className="flex items-center flex-1">
           <Link href="/" className="flex items-center gap-2 select-none group">
             <div className={`p-2 rounded-xl text-white shadow-md transition-all duration-300 ${isInstagram
               ? 'bg-gradient-to-tr from-instagram-purple via-instagram-pink to-instagram-orange'
@@ -65,7 +65,7 @@ export default function Header() {
         </div>
 
         {/* Menu Navigation */}
-        <div className="w-full md:w-auto order-last md:order-none flex justify-center">
+        <div className="w-full md:w-auto order-last md:order-none flex justify-center shrink-0">
           <nav className="flex items-center bg-neutral-100 dark:bg-zinc-900/60 p-1.5 rounded-full border border-neutral-200/50 dark:border-zinc-800/60 text-xs overflow-visible">
             <Link
               href="/"
@@ -137,7 +137,7 @@ export default function Header() {
         </div>
 
         {/* Theme Toggle / Actions */}
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center justify-end flex-1 gap-2 md:gap-4">
           <ThemeToggle />
         </div>
       </div>
