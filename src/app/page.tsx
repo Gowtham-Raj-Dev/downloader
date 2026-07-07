@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import PricingTable from '@/components/PricingTable';
 
 // Custom Instagram SVG icon component
 const Instagram = (props: React.SVGProps<SVGSVGElement>) => (
@@ -341,16 +340,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Pricing Section */}
-        <section id="pricing" className="w-full max-w-4xl mx-auto mb-24 text-center sm:text-left">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white mb-3 text-center sm:text-left">
-            Simple, Transparent Pricing
-          </h2>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-10 text-center sm:text-left">
-            Start downloading for free, or upgrade to a VIP pass for unrestricted batch features.
-          </p>
-          <PricingTable />
-        </section>
 
         {/* FAQ Section */}
         <section className="w-full max-w-4xl mx-auto mb-20 text-left">

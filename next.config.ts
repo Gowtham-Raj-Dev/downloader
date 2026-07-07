@@ -7,6 +7,13 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  output: "export",
+  images: {
+    unoptimized: true,
+  },
+  // Note: rewrites() are not supported in output: "export" (GitHub Pages)
+  // If you deploy to Firebase/Vercel, you can re-enable this.
+  /*
   async rewrites() {
     return [
       {
@@ -15,6 +22,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  */
 };
 
 export default nextConfig;

@@ -6,7 +6,6 @@ import { doc, getDoc, setDoc, updateDoc, arrayUnion, increment } from 'firebase/
 import { auth, db } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import RazorpayCheckout from '@/components/RazorpayCheckout';
 import ThemeToggle from '@/components/ThemeToggle';
 import { Loader2, LogOut, CheckCircle2, AlertCircle, Clock, Zap, DownloadCloud, Search, LayoutDashboard, Home, FileText, ChevronRight, ArrowUpDown, Download, Menu, X } from 'lucide-react';
 
@@ -59,15 +58,11 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [timeLeft, setTimeLeft] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [dailyCount, setDailyCount] = useState<number>(0);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
-  const [selectedDays, setSelectedDays] = useState(3);
 
   useEffect(() => {
     const fetchLimits = async () => {
@@ -140,64 +135,7 @@ export default function ProfilePage() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (!userData?.isPremium || !userData.premiumExpiry) return;
 
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const distance = userData.premiumExpiry! - now;
-
-      if (distance < 0) {
-        setTimeLeft('Expired');
-        setUserData(prev => prev ? { ...prev, isPremium: false } : null);
-        clearInterval(interval);
-
-        if (auth.currentUser) {
-          const userRef = doc(db, 'users', auth.currentUser.uid);
-          updateDoc(userRef, { isPremium: false }).catch(console.error);
-        }
-        return;
-      }
-
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-      setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [userData]);
-
-  const handlePaymentSuccess = async (days: number, amount: number) => {
-    if (!user) return;
-
-    const expiryDate = Date.now() + days * 24 * 60 * 60 * 1000;
-    const userRef = doc(db, 'users', user.uid);
-    const amountPaid = amount;
-
-    await updateDoc(userRef, {
-      isPremium: true,
-      premiumExpiry: expiryDate,
-      totalPayments: increment(1),
-      totalSpent: increment(amountPaid),
-      lastPaymentDate: Date.now(),
-      paymentHistory: arrayUnion({
-        date: Date.now(),
-        amount: amountPaid
-      })
-    });
-
-    setUserData(prev => prev ? {
-      ...prev,
-      isPremium: true,
-      premiumExpiry: expiryDate,
-      totalPayments: (prev.totalPayments || 0) + 1,
-      totalSpent: (prev.totalSpent || 0) + amountPaid,
-      paymentHistory: [...(prev.paymentHistory || []), { date: Date.now(), amount: amountPaid }]
-    } : null);
-    setShowSuccessModal(true);
-  };
 
   const platformsData = [
     {
@@ -367,33 +305,7 @@ export default function ProfilePage() {
         {/* SIDEBAR FOOTER (UPGRADE & USER) */}
         <div className="p-4 space-y-4 shrink-0">
 
-          {/* Upgrade Card matching the green "You're on Free Plan" box in reference image */}
-          {userData?.isPremium ? (
-            <div className="bg-[#18181b] border border-indigo-500/30 p-4 rounded-xl relative overflow-hidden shadow-[0_0_20px_rgba(99,102,241,0.1)]">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-500/20 rounded-full blur-2xl"></div>
-              <h4 className="text-white text-[13px] font-bold flex items-center gap-2 mb-1">
-                <Zap className="w-3.5 h-3.5 fill-indigo-400 text-indigo-400" /> VIP Pass Active
-              </h4>
-              <p className="text-[11px] text-neutral-400 mb-3 leading-relaxed">You have full unlimited access to all features.</p>
-              <div className="flex items-center justify-center gap-2 text-[10px] font-mono text-indigo-300 bg-white/5 py-1.5 px-2 rounded-lg border border-white/5">
-                <Clock className="w-3 h-3" /> {timeLeft}
-              </div>
-            </div>
-          ) : (
-            <div className="bg-gradient-to-br from-[#064e3b] to-[#022c22] border border-[#059669]/30 p-4 rounded-xl relative overflow-hidden shadow-[0_0_20px_rgba(5,150,105,0.15)]">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#10b981]/20 rounded-full blur-2xl"></div>
-              <div className="relative z-10">
-                <h4 className="text-white text-[13px] font-bold mb-1">You&apos;re on Free Plan</h4>
-                <p className="text-[11px] text-emerald-100/70 mb-3 leading-relaxed">Unlock unlimited access to all features and high-speed servers.</p>
-                <button
-                  onClick={() => setShowPurchaseModal(true)}
-                  className="w-full py-2 bg-white text-[#064e3b] font-bold text-xs rounded-lg hover:bg-neutral-100 transition-all shadow-lg cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  Explore Now 🚀
-                </button>
-              </div>
-            </div>
-          )}
+
 
           {/* User Profile Mini */}
           <div className="flex items-center justify-between p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer" onClick={() => setShowLogoutModal(true)}>
@@ -465,42 +377,7 @@ export default function ProfilePage() {
               </button>
             </div>
 
-            {/* PLAN DETAILS ROW */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-               <div className="bg-white dark:bg-[#111] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
-                 <h4 className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider mb-2">Current Plan <AlertCircle className="w-3 h-3 inline text-neutral-400 ml-1" /></h4>
-                 {userData?.isPremium ? (
-                   <span className="text-3xl font-black text-indigo-600 dark:text-indigo-400 flex items-center gap-2"><Zap className="w-6 h-6 fill-indigo-400 text-indigo-400" /> VIP Premium</span>
-                 ) : (
-                   <span className="text-3xl font-black text-emerald-600 dark:text-emerald-500">Free Plan</span>
-                 )}
-                 <p className="text-sm text-neutral-500 mt-3 font-medium">
-                   {userData?.isPremium ? `Expires on ${new Date(userData.premiumExpiry || 0).toLocaleDateString()}` : "Upgrade to unlock unlimited features & batch."}
-                 </p>
-               </div>
 
-               <div className="bg-white dark:bg-[#111] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
-                 <h4 className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider mb-2">Daily Quota Usage <Clock className="w-3 h-3 inline text-neutral-400 ml-1" /></h4>
-                 {userData?.isPremium ? (
-                   <div className="mt-1">
-                     <span className="text-3xl font-black text-neutral-900 dark:text-white flex items-center gap-2">
-                       ∞ Unlimited
-                     </span>
-                     <p className="text-sm text-neutral-500 mt-3 font-medium">You have no daily download limits.</p>
-                   </div>
-                 ) : (
-                   <div className="mt-1">
-                     <div className="flex items-baseline gap-2">
-                       <span className="text-3xl font-black text-neutral-900 dark:text-white">{dailyCount}</span>
-                       <span className="text-lg font-bold text-neutral-400">/ 10</span>
-                     </div>
-                     <div className="w-full bg-neutral-100 dark:bg-neutral-800 rounded-full h-2 mt-3 overflow-hidden">
-                       <div className="bg-emerald-500 h-2 rounded-full transition-all" style={{ width: `${Math.min((dailyCount / 10) * 100, 100)}%` }}></div>
-                     </div>
-                   </div>
-                 )}
-               </div>
-            </div>
 
             {/* STAT CARDS ROW */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -540,16 +417,7 @@ export default function ProfilePage() {
 
               </div>
 
-              {/* Card 3 */}
-              <div className="bg-[#fdf4ff] dark:bg-[#1f1522] border border-fuchsia-100 dark:border-fuchsia-900/30 rounded-2xl p-6 shadow-sm flex flex-col relative overflow-hidden">
-                <div className="flex items-center gap-2 mb-6">
-                  <Zap className="w-4 h-4 text-fuchsia-400" />
-                  <h4 className="text-[11px] font-bold text-fuchsia-500 uppercase tracking-wider">TOTAL SPENT <AlertCircle className="w-3 h-3 inline text-fuchsia-300 ml-1" /></h4>
-                </div>
-                <span className="text-4xl font-black text-fuchsia-900 dark:text-fuchsia-100">₹{userData?.totalSpent || 0}</span>
 
-
-              </div>
 
             </div>
 
@@ -634,69 +502,6 @@ export default function ProfilePage() {
       </div>
 
       {/* MODALS */}
-      {showPurchaseModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-          <div className="bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 max-w-sm w-full shadow-2xl relative">
-            <button onClick={() => setShowPurchaseModal(false)} className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 cursor-pointer">
-              <X className="w-5 h-5" />
-            </button>
-            <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-500 rounded-full flex items-center justify-center mb-4">
-              <Zap className="w-6 h-6" />
-            </div>
-            <h2 className="text-xl font-black text-neutral-900 dark:text-white mb-2">Custom VIP Pass</h2>
-            <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm mb-6">
-              Select how many days of VIP access you need. 1 Day is ₹10, and each additional day is just ₹9!
-            </p>
-            
-            <div className="flex items-center justify-between bg-neutral-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-neutral-200 dark:border-zinc-700 mb-6">
-              <div className="flex flex-col">
-                <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Days</span>
-                <div className="flex items-center gap-3 mt-1">
-                  <button 
-                    onClick={() => setSelectedDays(Math.max(1, selectedDays - 1))}
-                    className="w-8 h-8 rounded-md bg-white dark:bg-zinc-800 border border-neutral-200 dark:border-zinc-700 flex items-center justify-center font-bold text-lg hover:bg-neutral-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
-                  >-</button>
-                  <span className="text-xl font-black text-neutral-900 dark:text-white w-6 text-center">{selectedDays}</span>
-                  <button 
-                    onClick={() => setSelectedDays(selectedDays + 1)}
-                    className="w-8 h-8 rounded-md bg-white dark:bg-zinc-800 border border-neutral-200 dark:border-zinc-700 flex items-center justify-center font-bold text-lg hover:bg-neutral-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
-                  >+</button>
-                </div>
-              </div>
-              <div className="text-right">
-                <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Total</span>
-                <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">₹{10 + (selectedDays - 1) * 9}</p>
-              </div>
-            </div>
-
-            <RazorpayCheckout
-              userEmail={user.email || ''}
-              days={selectedDays}
-              amount={10 + (selectedDays - 1) * 9}
-              onSuccess={(d, a) => {
-                setShowPurchaseModal(false);
-                handlePaymentSuccess(d, a);
-              }}
-              variant="button"
-            />
-          </div>
-        </div>
-      )}
-
-      {showSuccessModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-          <div className="bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="w-8 h-8" />
-            </div>
-            <h2 className="text-2xl font-black text-neutral-900 dark:text-white mb-2">Payment Successful!</h2>
-            <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-8">
-              Your VIP Pass is now active.
-            </p>
-            <button onClick={() => setShowSuccessModal(false)} className="w-full py-3 bg-neutral-900 dark:bg-white text-white dark:text-black font-bold rounded-xl transition-colors hover:bg-black">Awesome!</button>
-          </div>
-        </div>
-      )}
 
       {showLogoutModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">

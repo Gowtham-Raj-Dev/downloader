@@ -693,28 +693,6 @@ export default function YoutubePage() {
                         </div>
                       )}
 
-                      {/* Duration */}
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
-                          Video Duration
-                        </span>
-                        <p className="text-xs font-bold text-neutral-800 dark:text-neutral-200 bg-neutral-100 dark:bg-zinc-950 border border-neutral-200/40 dark:border-neutral-800/60 py-2.5 px-3 rounded-button">
-                          {displayDuration}
-                        </p>
-                      </div>
-
-                      {/* Estimated Size */}
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
-                          Estimated Size
-                        </span>
-                        <p className="text-xs font-bold text-neutral-800 dark:text-neutral-200 bg-neutral-100 dark:bg-zinc-950 border border-neutral-200/40 dark:border-neutral-800/60 py-2.5 px-3 rounded-button flex justify-between">
-                          <span>720p: {getEstimatedSize(displayDuration, '720', singleVideo.sizeMb)}</span>
-                          <span className="text-neutral-400 dark:text-neutral-600">|</span>
-                          <span>360p: {getEstimatedSize(displayDuration, '360', singleVideo.sizeMb)}</span>
-                        </p>
-                      </div>
-
 
                     </div>
 

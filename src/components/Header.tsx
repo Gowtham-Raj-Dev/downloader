@@ -99,12 +99,6 @@ export default function Header() {
               How it works
             </Link>
 
-            <Link
-              href="/#pricing"
-              className="px-3 md:px-4 py-2 rounded-full font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap text-neutral-500 hover:text-neutral-950 dark:hover:text-white"
-            >
-              Pricing
-            </Link>
 
             <div className="relative" ref={dropdownRef}>
               <button
