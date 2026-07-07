@@ -64,14 +64,6 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  verification: {
-    google: "add-your-google-site-verification-here", // User can replace this later
-  },
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/favicon.ico',
-  },
 };
 
 const jsonLd = {
@@ -97,6 +89,9 @@ export default function RootLayout({
       <head>
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+        <link rel="icon" href="/favicon.ico?v=2" sizes="any" />
+        <link rel="shortcut icon" href="/favicon.ico?v=2" />
+        <link rel="apple-touch-icon" href="/favicon.ico?v=2" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
