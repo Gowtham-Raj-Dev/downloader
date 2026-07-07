@@ -7,14 +7,18 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  async rewrites() {
-    return [
-      {
-        source: "/__/auth/:path*",
-        destination: "https://downloader-codelove.firebaseapp.com/__/auth/:path*",
-      },
-    ];
+  output: "export",
+  images: {
+    unoptimized: true,
   },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: "/__/auth/:path*",
+  //       destination: "https://downloader-codelove.firebaseapp.com/__/auth/:path*",
+  //     },
+  //   ];
+  // },
 };
 
 export default nextConfig;
