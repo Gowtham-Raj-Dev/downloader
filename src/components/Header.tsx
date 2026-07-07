@@ -5,25 +5,10 @@ import { usePathname } from 'next/navigation';
 import { Download, ChevronDown } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { useState, useEffect, useRef } from 'react';
-import { auth } from '@/lib/firebase';
-import { User } from 'firebase/auth';
 
 export default function Header() {
   const pathname = usePathname();
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      setUser(currentUser);
-      setIsAuthLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const handleLogin = () => {
-    window.location.href = '/login';
-  };
 
   const isHome = pathname === '/';
   const isInstagram = pathname.startsWith('/instagram');
@@ -154,25 +139,6 @@ export default function Header() {
         {/* Theme Toggle / Actions */}
         <div className="flex items-center gap-2 md:gap-4">
           <ThemeToggle />
-          {isAuthLoading ? (
-            <div className="w-20 h-9 bg-neutral-200 dark:bg-zinc-800 animate-pulse rounded-lg"></div>
-          ) : user ? (
-            <Link
-              href="/profile"
-              className="flex items-center gap-2 px-3 md:px-4 py-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-sm font-bold text-neutral-800 dark:text-neutral-200 rounded-lg transition-colors shadow-sm border border-neutral-200 dark:border-zinc-700"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={user.photoURL || `https://ui-avatars.com/api/?name=${user.email}`} alt="" className="w-5 h-5 rounded-full" />
-              <span className="hidden sm:inline">Profile</span>
-            </Link>
-          ) : (
-            <button
-              onClick={handleLogin}
-              className="px-3 md:px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors cursor-pointer"
-            >
-              Sign In
-            </button>
-          )}
         </div>
       </div>
     </header>
