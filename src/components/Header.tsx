@@ -139,6 +139,12 @@ export default function Header() {
         {/* Theme Toggle / Actions */}
         <div className="flex items-center justify-end flex-1 gap-2 md:gap-4">
           <ThemeToggle />
+          <Link
+            href="/instagram"
+            className="px-3 md:px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors cursor-pointer"
+          >
+            Get Started
+          </Link>
         </div>
       </div>
     </header>

@@ -67,6 +67,11 @@ export const metadata: Metadata = {
   verification: {
     google: "add-your-google-site-verification-here", // User can replace this later
   },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
 };
 
 const jsonLd = {
