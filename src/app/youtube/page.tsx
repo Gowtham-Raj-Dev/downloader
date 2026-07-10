@@ -399,31 +399,17 @@ export default function YoutubePage() {
       const response = await fetch(`/api/youtube?url=${encodeURIComponent(singleVideo.youtubeUrl)}&quality=${quality}`);
       const result = await response.json();
       if (result.success && result.data?.videoUrl) {
-        setDownloadProgress(60);
+        setDownloadProgress(100);
         
-        // We fetch the video as a Blob first so we can track when it's fully downloaded.
-        // This keeps the "Downloading..." spinner active until the file is completely saved to memory.
-        const fileResponse = await fetch(result.data.videoUrl);
-        
-        if (!fileResponse.ok) {
-          throw new Error('Network response was not ok');
-        }
-        
-        const blob = await fileResponse.blob();
-        setDownloadProgress(90);
-        
-        const blobUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        
+        // Native download approach: avoids 0 duration blob bugs on iOS/Android
+        const a = document.createElement('a');
+        a.href = result.data.videoUrl;
         const cleanTitle = (singleVideo.title || 'youtube_video').replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        link.setAttribute('download', `${cleanTitle}.mp4`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // Clean up the object URL to free memory
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+        a.setAttribute('download', `${cleanTitle}.mp4`);
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
         
         trackUserAction('youtube', 'single', 'download', 1);
       } else {
