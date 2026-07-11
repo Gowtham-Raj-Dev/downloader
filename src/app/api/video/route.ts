@@ -589,7 +589,10 @@ export async function GET(request: NextRequest) {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+          'Origin': 'https://downloader.codelove.in',
+          'Referer': 'https://downloader.codelove.in/'
         },
         body: JSON.stringify({
           url: url

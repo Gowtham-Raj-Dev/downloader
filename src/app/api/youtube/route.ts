@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-const COBALT_INSTANCES = [
+const FALLBACK_COBALT_INSTANCES = [
   "https://rue-cobalt.xenon.zone",
   "https://nuko-c.meowing.de",
   "https://melon.clxxped.lol",
@@ -65,19 +65,38 @@ export async function GET(request: NextRequest) {
       console.warn('Failed to extract exact stats from YT source:', e);
     }
 
-    // 2. Fetch direct download link
+    // 1. Try Cobalt API instances first (high speed, supports direct CDN tunneling)
+    let cobaltInstances = [...FALLBACK_COBALT_INSTANCES];
+    try {
+      const directoryRes = await fetch("https://cobalt.directory/api/working?type=api", {
+        signal: AbortSignal.timeout(4000)
+      });
+      if (directoryRes.ok) {
+        const dirJson = await directoryRes.json();
+        if (dirJson.data && Array.isArray(dirJson.data.youtube) && dirJson.data.youtube.length > 0) {
+          const fetchedList = dirJson.data.youtube;
+          cobaltInstances = Array.from(new Set([...fetchedList, ...FALLBACK_COBALT_INSTANCES]));
+          console.log(`Successfully fetched ${fetchedList.length} dynamic Cobalt instances for YouTube.`);
+        }
+      }
+    } catch (dirErr) {
+      console.warn("Failed to fetch dynamic Cobalt instances, using fallback list:", dirErr);
+    }
+
     let downloadUrl = null;
     const errorMsg = 'Failed to extract download link from all Cobalt instances.';
 
-    // Try Cobalt first for all qualities
-    for (const instance of COBALT_INSTANCES) {
+    for (const instance of cobaltInstances) {
       try {
         console.log(`Trying Cobalt instance: ${instance} for URL: ${url} (quality: ${quality})`);
         const res = await fetch(instance, {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'Origin': 'https://downloader.codelove.in',
+            'Referer': 'https://downloader.codelove.in/'
           },
           body: JSON.stringify({
             url: url,
