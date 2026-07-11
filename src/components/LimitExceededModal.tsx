@@ -60,7 +60,7 @@ export default function LimitExceededModal({ isOpen, onClose, type }: LimitExcee
 
                 {type === 'guest' ? (
                   <div className="w-full space-y-3">
-                    <Link href="/login" onClick={onClose} className="flex items-center justify-center w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-colors">
+                    <Link href="/" onClick={onClose} className="flex items-center justify-center w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-colors">
                       Sign In Now
                     </Link>
                     <button onClick={onClose} className="w-full py-3 px-4 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 font-medium transition-colors">

@@ -5,9 +5,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Clipboard, ArrowRight, Sparkles, Link as LinkIcon, Plus, Trash2, Lock } from 'lucide-react';
-import { useEffect, useState as useReactState } from 'react';
-import { auth, db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { useState as useReactState } from 'react';
 
 
 interface HeroSectionProps {
@@ -28,32 +26,6 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
 
   const [url, setUrl] = useReactState('');
   const [urlFields, setUrlFields] = useReactState<string[]>(['', '']); // 2 empty boxes by default
-
-  const [isPremium, setIsPremium] = useReactState(false);
-  const [isAuthLoading, setIsAuthLoading] = useReactState(true);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
-
-      if (currentUser) {
-        const userRef = doc(db, 'users', currentUser.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          if (data.isPremium && data.premiumExpiry > Date.now()) {
-            setIsPremium(true);
-          } else {
-            setIsPremium(false);
-          }
-        }
-      } else {
-        setIsPremium(false);
-      }
-      setIsAuthLoading(false);
-    });
-    return () => unsubscribe();
-  }, [setIsPremium, setIsAuthLoading]);
-
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
@@ -226,28 +198,6 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
-        ) : isAuthLoading ? (
-          <div className="py-12 flex flex-col items-center justify-center gap-3">
-            <div className="w-8 h-8 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
-            <span className="text-xs font-semibold text-neutral-500 animate-pulse uppercase tracking-wider">Checking Premium Status...</span>
-          </div>
-        ) : (!isPremium && isPremiumFeature) ? (
-          <div className="py-8 px-4 text-center border border-indigo-200 dark:border-indigo-900/50 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20">
-            <div className="w-12 h-12 mx-auto bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-500 mb-3">
-              <Lock className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-200 mb-2">Premium Feature Locked</h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto mb-6">
-              Batch downloading multiple URLs at once is a premium feature. Upgrade to fetch multiple {isPinterestImage ? 'images' : 'videos'} simultaneously with zero limits!
-            </p>
-            <Link
-              href="/profile"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-button shadow-md transition-all cursor-pointer"
-            >
-              <span>Unlock Premium for ₹29</span>
-              <Sparkles className="w-4 h-4" />
-            </Link>
-          </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-3">
