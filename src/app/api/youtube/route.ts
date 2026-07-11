@@ -81,9 +81,7 @@ export async function GET(request: NextRequest) {
           },
           body: JSON.stringify({
             url: url,
-            videoQuality: quality,
-            youtubeVideoCodec: "h264",
-            alwaysProxy: true
+            videoQuality: quality
           }),
           signal: AbortSignal.timeout(6000) // 6 second timeout per instance
         });

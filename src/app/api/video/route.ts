@@ -592,8 +592,7 @@ export async function GET(request: NextRequest) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          url: url,
-          alwaysProxy: true
+          url: url
         }),
         signal: AbortSignal.timeout(6000)
       });
