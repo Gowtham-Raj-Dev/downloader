@@ -111,6 +111,12 @@ const fetchCobaltClientSide = async (url: string, quality: string, instances: st
       if (res.ok) {
         const json = await res.json();
         if (json.url) {
+          // If it's a direct YouTube CDN link, it's highly reliable.
+          // Verifying it would fail due to CORS, and appending cache-busters breaks its signature.
+          if (json.url.includes('googlevideo.com')) {
+            return json.url;
+          }
+
           // Verify that the returned stream is not a 0-byte dead tunnel (IP blocked by YouTube)
           try {
             const controller = new AbortController();
@@ -406,7 +412,6 @@ export default function YoutubePage() {
         // Native direct download
         const link = document.createElement('a');
         link.href = directDownloadUrl;
-        link.target = '_blank';
         const cleanTitle = (video.title || `youtube_video_${i + 1}`).replace(/[^a-z0-9]/gi, '_').toLowerCase();
         link.setAttribute('download', `${cleanTitle}.mp4`);
         document.body.appendChild(link);
