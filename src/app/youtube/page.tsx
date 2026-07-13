@@ -863,7 +863,9 @@ export default function YoutubePage() {
                             )}
                             <span>{downloadingQuality === '720' ? 'Downloading...' : '720p HD MP4'}</span>
                           </div>
-                          <span className="text-[9px] font-medium opacity-80">(Perfect Mobile Duration)</span>
+                          <span className="text-[9px] font-medium opacity-80">
+                            {displayDuration ? `${displayDuration} • ` : ''}{getEstimatedSize(displayDuration || '0:00', '720', singleVideo.sizeMb)}
+                          </span>
                         </button>
                         
                         <button
@@ -879,7 +881,9 @@ export default function YoutubePage() {
                             )}
                             <span>{downloadingQuality === '360' ? 'Downloading...' : 'Mobile Compatible 360p'}</span>
                           </div>
-                          <span className="text-[9px] font-medium opacity-80">(Perfect Duration, Low Quality)</span>
+                          <span className="text-[9px] font-medium opacity-80">
+                            {displayDuration ? `${displayDuration} • ` : ''}{getEstimatedSize(displayDuration || '0:00', '360', singleVideo.sizeMb)}
+                          </span>
                         </button>
                       </div>
                     </div>

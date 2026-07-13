@@ -285,7 +285,7 @@ export default function VideoGallery({ videos, onPreview, hideFilters = false }:
 
                 {/* Duration Tag */}
                 <span className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-[10px] font-bold text-white px-2 py-0.5 rounded border border-white/10 select-none">
-                  {video.duration}
+                  {video.exactDuration || video.duration}
                 </span>
 
                 {/* Type Tag */}
