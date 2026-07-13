@@ -99,14 +99,14 @@ const fetchCobaltClientSide = async (url: string, quality: string, instances: st
   
   for (const instance of shuffled) {
     try {
-      const res = await fetch(instance, {
+      // Use our backend proxy to bypass CORS restrictions on instances that don't allow browser POSTs
+      const res = await fetch('/api/cobalt', {
         method: 'POST',
         headers: {
-          'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ url, videoQuality: quality }),
-        signal: AbortSignal.timeout(6000)
+        body: JSON.stringify({ url, videoQuality: quality, instance }),
+        signal: AbortSignal.timeout(8000)
       });
       if (res.ok) {
         const json = await res.json();
