@@ -127,7 +127,8 @@ const fetchCobaltClientSide = async (url: string, quality: string, instances: st
             continue;
           }
           
-          return json.url;
+          // Append a cache-buster so the browser's network stack doesn't reuse the aborted socket for the actual download
+          return json.url + (json.url.includes('?') ? '&' : '?') + '_cb=' + Date.now();
         }
       }
     } catch (e) {
@@ -488,7 +489,6 @@ export default function YoutubePage() {
         a.href = directDownloadUrl;
         const cleanTitle = (singleVideo.title || 'youtube_video').replace(/[^a-z0-9]/gi, '_').toLowerCase();
         a.setAttribute('download', `${cleanTitle}.mp4`);
-        a.target = '_blank';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
