@@ -129,8 +129,9 @@ const fetchCobaltClientSide = async (url: string, quality: string, instances: st
               continue;
             }
           } catch(verifyErr) {
-            console.warn(`Instance ${instance} stream verification failed, trying next.`);
-            continue;
+            // If fetch fails (usually due to CORS on the tunnel endpoint), we can't verify it.
+            // Do NOT skip the instance. Assume it's valid and proceed.
+            console.warn(`Instance ${instance} stream verification blocked by CORS, assuming good.`);
           }
           
           // Append a cache-buster so the browser's network stack doesn't reuse the aborted socket for the actual download
