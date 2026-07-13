@@ -46,16 +46,48 @@ export async function GET(request: NextRequest) {
     let exactDuration = null;
     let exactSizeMb = 0;
     try {
-      const ytRes = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }, signal: AbortSignal.timeout(4000) });
+      const ytRes = await fetch(url, { 
+        headers: { 
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+          'Cookie': 'SOCS=CAI' // Bypasses EU/Bot consent pages
+        }, 
+        signal: AbortSignal.timeout(4000) 
+      });
       if (ytRes.ok) {
         const html = await ytRes.text();
+        
+        let totalSeconds = 0;
+        
+        // 1. Try approxDurationMs
         const dm = html.match(new RegExp('approxDurationMs.:.(\\d+)'));
         if (dm && dm[1]) {
-           const durationSec = Math.round(parseInt(dm[1]) / 1000);
-           const m = Math.floor(durationSec / 60);
-           const s = durationSec % 60;
+           totalSeconds = Math.round(parseInt(dm[1]) / 1000);
+        } else {
+           // 2. Try lengthSeconds
+           const ls = html.match(/"lengthSeconds"\s*:\s*"(\d+)"/);
+           if (ls && ls[1]) {
+             totalSeconds = parseInt(ls[1]);
+           } else {
+             // 3. Try meta itemprop
+             const pt = html.match(/itemprop="duration" content="([^"]+)"/);
+             if (pt && pt[1]) {
+               const match = pt[1].match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+               if (match) {
+                 const h = parseInt(match[1] || '0');
+                 const m = parseInt(match[2] || '0');
+                 const s = parseInt(match[3] || '0');
+                 totalSeconds = h * 3600 + m * 60 + s;
+               }
+             }
+           }
+        }
+        
+        if (totalSeconds > 0) {
+           const m = Math.floor(totalSeconds / 60);
+           const s = totalSeconds % 60;
            exactDuration = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
+        
         const smMatches = [...html.matchAll(new RegExp('contentLength.:.(\\d+)', 'g'))].map(m => parseInt(m[1]));
         if (smMatches.length > 0) {
            exactSizeMb = Math.max(...smMatches) / (1024 * 1024);

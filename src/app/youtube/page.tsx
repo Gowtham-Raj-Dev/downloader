@@ -524,7 +524,7 @@ export default function YoutubePage() {
 
   const displayDuration = singleVideo?.exactDuration
     ? singleVideo.exactDuration
-    : (loadedDuration !== '0:00' ? loadedDuration : (singleVideo?.duration || '0:00'));
+    : (loadedDuration !== '0:00' ? loadedDuration : (singleVideo?.duration || null));
 
   return (
     <div className="min-h-screen flex flex-col justify-between selection:bg-red-500/20 selection:text-red-600 dark:selection:text-red-500">
