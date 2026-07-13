@@ -156,6 +156,7 @@ export default function YoutubePage() {
   // ZIP states
   const [zipProgress, setZipProgress] = useState(0);
   const [isZipping, setIsZipping] = useState(false);
+  const [isDownloadingSingle, setIsDownloadingSingle] = useState(false);
 
   // Modal states
   const [previewVideo, setPreviewVideo] = useState<YoutubeVideoItem | null>(null);
@@ -488,18 +489,43 @@ export default function YoutubePage() {
           return;
         }
 
-        setDownloadProgress(100);
+        setDownloadProgress(60); // Indicates stream extracted, starting download
         
-        // Native download approach: avoids 0 duration blob bugs on iOS/Android
-        const a = document.createElement('a');
-        a.href = directDownloadUrl;
-        const cleanTitle = (singleVideo.title || 'youtube_video').replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        a.setAttribute('download', `${cleanTitle}.mp4`);
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        
-        trackUserAction('youtube', 'single', 'download', 1);
+        try {
+          // Fetch as blob to ensure iOS parses the MP4 MOOV atom correctly (fixes 0:00 duration)
+          // because the raw Cobalt tunnel lacks a Content-Length header.
+          const blobRes = await fetch(directDownloadUrl);
+          if (!blobRes.ok) throw new Error('Failed to download video stream');
+          
+          const blob = await blobRes.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          
+          setDownloadProgress(100);
+          
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          const cleanTitle = (singleVideo.title || 'youtube_video').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+          a.setAttribute('download', `${cleanTitle}.mp4`);
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+          trackUserAction('youtube', 'single', 'download', 1);
+        } catch (blobErr) {
+          console.error('Blob download failed, falling back to native download', blobErr);
+          setDownloadProgress(100);
+          
+          const a = document.createElement('a');
+          a.href = directDownloadUrl;
+          const cleanTitle = (singleVideo.title || 'youtube_video').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+          a.setAttribute('download', `${cleanTitle}.mp4`);
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          
+          trackUserAction('youtube', 'single', 'download', 1);
+        }
       } else {
         alert('Failed to extract ' + quality + 'p video.');
       }
@@ -513,11 +539,34 @@ export default function YoutubePage() {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleDownloadVideo = (video: YoutubeVideoItem) => {
-    window.location.assign(video.videoUrl);
+  const handleDownloadVideo = async (video: YoutubeVideoItem) => {
     const type = fetchedVideos.length > 0 ? 'multi' : 'single';
     trackUserAction('youtube', type, 'download', 1);
+
+    setIsDownloadingSingle(true);
+    try {
+      // Fetch as blob to ensure iOS parses the MP4 MOOV atom correctly (fixes 0:00 duration)
+      // because the raw Cobalt tunnel lacks a Content-Length header.
+      const response = await fetch(video.videoUrl);
+      if (!response.ok) throw new Error('Failed to download video stream');
+      
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `${video.caption ? video.caption.substring(0, 30) : 'youtube_video'}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+    } catch (err) {
+      console.error('Blob download failed, falling back to native download', err);
+      window.location.assign(video.videoUrl);
+    } finally {
+      setIsDownloadingSingle(false);
+    }
   };
 
 
