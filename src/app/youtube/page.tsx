@@ -85,11 +85,11 @@ const fetchCobaltClientSide = async (url: string, quality: string, instances: st
   let activeInstances = instances;
   if (!activeInstances || activeInstances.length === 0) {
     activeInstances = [
+      "https://api.cobalt.liubquanti.click",
       "https://rue-cobalt.xenon.zone",
       "https://nuko-c.meowing.de",
       "https://melon.clxxped.lol",
       "https://cobalt.omega.wolfy.love",
-      "https://subito-c.meowing.de",
       "https://lime.clxxped.lol"
     ];
   }

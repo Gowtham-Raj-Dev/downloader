@@ -3,11 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 const FALLBACK_COBALT_INSTANCES = [
+  "https://api.cobalt.liubquanti.click",
   "https://rue-cobalt.xenon.zone",
   "https://nuko-c.meowing.de",
   "https://melon.clxxped.lol",
   "https://cobalt.omega.wolfy.love",
-  "https://subito-c.meowing.de",
   "https://lime.clxxped.lol"
 ];
 
