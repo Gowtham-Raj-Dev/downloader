@@ -81,6 +81,62 @@ const getEstimatedSize = (durationStr: string | undefined, quality: string, exac
   return `${sizeMb.toFixed(1)} MB`;
 };
 
+const fetchCobaltClientSide = async (url: string, quality: string, instances: string[] = []) => {
+  let activeInstances = instances;
+  if (!activeInstances || activeInstances.length === 0) {
+    activeInstances = [
+      "https://rue-cobalt.xenon.zone",
+      "https://nuko-c.meowing.de",
+      "https://melon.clxxped.lol",
+      "https://cobalt.omega.wolfy.love",
+      "https://subito-c.meowing.de",
+      "https://lime.clxxped.lol"
+    ];
+  }
+  
+  // Shuffle instances to balance load when fetching multiple links
+  const shuffled = [...activeInstances].sort(() => Math.random() - 0.5);
+  
+  for (const instance of shuffled) {
+    try {
+      const res = await fetch(instance, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ url, videoQuality: quality }),
+        signal: AbortSignal.timeout(6000)
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.url) {
+          // Verify that the returned stream is not a 0-byte dead tunnel (IP blocked by YouTube)
+          try {
+            const controller = new AbortController();
+            const verifyRes = await fetch(json.url, { method: 'GET', signal: controller.signal });
+            const cLen = verifyRes.headers.get('content-length');
+            controller.abort(); // Immediately cancel the download after getting headers
+            
+            if (cLen === '0') {
+              console.warn(`Instance ${instance} returned a 0-byte dead stream, trying next.`);
+              continue;
+            }
+          } catch(verifyErr) {
+            console.warn(`Instance ${instance} stream verification failed, trying next.`);
+            continue;
+          }
+          
+          return json.url;
+        }
+      }
+    } catch (e) {
+      console.warn(`Client Cobalt fetch failed for ${instance}`);
+    }
+  }
+  return null;
+};
+
 export default function YoutubePage() {
   const { isLoggedIn, isPremium, checkDailyLimit, incrementDailyLimit } = useUserLimits();
   const [activeUsername, setActiveUsername] = useState<string | null>(null);
@@ -149,12 +205,17 @@ export default function YoutubePage() {
         throw new Error('Failed to fetch selected quality');
       }
       const result = await response.json();
-      if (result.success && result.data?.videoUrl) {
+      if (result.success) {
+        const instances = result.data?.cobaltInstances || [];
+        const clientVideoUrl = await fetchCobaltClientSide(singleVideo.youtubeUrl, newQuality, instances);
+        if (!clientVideoUrl) throw new Error('Failed to extract video URL for new quality');
+
         setSingleVideo(prev => {
           if (!prev) return null;
           return {
             ...prev,
-            videoUrl: result.data.videoUrl
+            videoUrl: clientVideoUrl,
+            cobaltInstances: instances
           };
         });
       } else {
@@ -233,6 +294,13 @@ export default function YoutubePage() {
         }
 
         const data = result.data;
+        const instances = data.cobaltInstances || [];
+        const clientVideoUrl = await fetchCobaltClientSide(url, defaultQuality, instances);
+        
+        if (!clientVideoUrl) {
+          throw new Error(`Failed to extract playable video stream for: ${url}`);
+        }
+
         const videoId = extractYoutubeId(url) || 'youtube_video';
 
         // Deterministic stats just like original
@@ -253,7 +321,7 @@ export default function YoutubePage() {
         return {
           id: `${videoId}_${randomStr}`,
           thumbnail: data.thumbnail,
-          videoUrl: data.videoUrl,
+          videoUrl: clientVideoUrl,
           uploadDate: 'Just now',
           views,
           likes,
@@ -266,7 +334,8 @@ export default function YoutubePage() {
           author: data.author,
           duration: fallbackDuration,
           sizeMb: data.sizeMb,
-          exactDuration: data.exactDuration
+          exactDuration: data.exactDuration,
+          cobaltInstances: instances
         } as YoutubeVideoItem;
       });
 
@@ -326,11 +395,16 @@ export default function YoutubePage() {
         if (!response.ok) throw new Error('Network error');
         
         const result = await response.json();
-        if (!result.success || !result.data?.videoUrl) throw new Error('Video extraction failed');
+        if (!result.success) throw new Error('Video metadata extraction failed');
+
+        const instances = result.data?.cobaltInstances || video.cobaltInstances || [];
+        const directDownloadUrl = await fetchCobaltClientSide(video.youtubeUrl || video.videoUrl, globalQuality, instances);
+        
+        if (!directDownloadUrl) throw new Error('Video stream extraction failed');
 
         // Native direct download
         const link = document.createElement('a');
-        link.href = result.data.videoUrl;
+        link.href = directDownloadUrl;
         link.target = '_blank';
         const cleanTitle = (video.title || `youtube_video_${i + 1}`).replace(/[^a-z0-9]/gi, '_').toLowerCase();
         link.setAttribute('download', `${cleanTitle}.mp4`);
@@ -398,12 +472,20 @@ export default function YoutubePage() {
     try {
       const response = await fetch(`/api/youtube?url=${encodeURIComponent(singleVideo.youtubeUrl)}&quality=${quality}`);
       const result = await response.json();
-      if (result.success && result.data?.videoUrl) {
+      if (result.success) {
+        const instances = result.data?.cobaltInstances || singleVideo.cobaltInstances || [];
+        const directDownloadUrl = await fetchCobaltClientSide(singleVideo.youtubeUrl, quality, instances);
+        
+        if (!directDownloadUrl) {
+          alert('Failed to extract ' + quality + 'p video stream.');
+          return;
+        }
+
         setDownloadProgress(100);
         
         // Native download approach: avoids 0 duration blob bugs on iOS/Android
         const a = document.createElement('a');
-        a.href = result.data.videoUrl;
+        a.href = directDownloadUrl;
         const cleanTitle = (singleVideo.title || 'youtube_video').replace(/[^a-z0-9]/gi, '_').toLowerCase();
         a.setAttribute('download', `${cleanTitle}.mp4`);
         a.target = '_blank';

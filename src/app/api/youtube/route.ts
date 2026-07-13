@@ -83,54 +83,8 @@ export async function GET(request: NextRequest) {
       console.warn("Failed to fetch dynamic Cobalt instances, using fallback list:", dirErr);
     }
 
-    let downloadUrl = null;
-    const errorMsg = 'Failed to extract download link from all Cobalt instances.';
-
-    for (const instance of cobaltInstances) {
-      try {
-        console.log(`Trying Cobalt instance: ${instance} for URL: ${url} (quality: ${quality})`);
-        const res = await fetch(instance, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-            'Origin': 'https://downloader.codelove.in',
-            'Referer': 'https://downloader.codelove.in/'
-          },
-          body: JSON.stringify({
-            url: url,
-            videoQuality: quality
-          }),
-          signal: AbortSignal.timeout(6000) // 6 second timeout per instance
-        });
-
-        if (res.ok) {
-          const json = await res.json();
-          if (json && json.url) {
-            downloadUrl = json.url;
-            console.log(`Success with Cobalt instance ${instance}! URL: ${downloadUrl}`);
-            break;
-          }
-        } else {
-          const errBody = await res.text();
-          console.warn(`Cobalt instance ${instance} returned status ${res.status}: ${errBody}`);
-        }
-      } catch (instErr) {
-        console.warn(`Error connecting to Cobalt instance ${instance}:`, instErr instanceof Error ? instErr.message : instErr);
-      }
-    }
-
-    // Fallback: If Cobalt fails and it is standard quality, use our local yt-dlp proxy stream
-    const isHighQuality = ['1080', '1440', '2160', '4320', 'max'].includes(quality);
-    if (!downloadUrl && !isHighQuality) {
-      downloadUrl = `/api/youtube/proxy?url=${encodeURIComponent(url)}`;
-      console.log(`Using yt-dlp proxy stream for standard quality fallback: ${downloadUrl}`);
-    }
-
-    if (!downloadUrl) {
-      return NextResponse.json({ error: errorMsg }, { status: 502 });
-    }
+    // We skip server-side Cobalt fetching to prevent Tunnel IP binding issues.
+    // The client will fetch the Cobalt tunnel URL directly using their residential IP.
 
     // 3. Return combined response
     return NextResponse.json({
@@ -139,9 +93,10 @@ export async function GET(request: NextRequest) {
         title: metadata.title,
         author: metadata.author,
         thumbnail: metadata.thumbnail,
-        videoUrl: downloadUrl,
+        videoUrl: null, // Client will fetch this
         sizeMb: exactSizeMb || null,
-        exactDuration: exactDuration
+        exactDuration: exactDuration,
+        cobaltInstances: cobaltInstances
       }
     });
 

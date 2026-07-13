@@ -6,6 +6,7 @@ export interface YoutubeVideoItem extends VideoItem {
   author?: string;
   sizeMb?: number;
   exactDuration?: string;
+  cobaltInstances?: string[];
 }
 
 export function isYoutubeVideoUrl(input: string): boolean {
