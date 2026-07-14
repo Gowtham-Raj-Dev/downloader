@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@distube/ytdl-core": "^4.16.12",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
     "@jerrycoder/instagram-api": "^2.5.9",
     "@myno_21/pinterest-scraper": "^1.0.4",
     "@sasmeee/igdl": "^0.0.1-security",

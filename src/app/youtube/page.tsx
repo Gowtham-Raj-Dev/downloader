@@ -23,6 +23,7 @@ import {
 import { VideoItem } from '@/data/mockProfiles';
 import { trackUserAction } from '@/lib/analytics';
 import { useUserLimits } from '@/lib/useUserLimits';
+import { remuxToPlayableMp4 } from '@/lib/remuxFmp4';
 
 // Custom Youtube SVG icon component
 const Youtube = (props: React.SVGProps<SVGSVGElement>) => (
@@ -411,14 +412,23 @@ export default function YoutubePage() {
         
         if (!directDownloadUrl) throw new Error('Video stream extraction failed');
 
-        // Native direct download
+        // Fetch + remux fragmented MP4 -> progressive MP4 so the saved file
+        // carries a real duration (not 0:00) on mobile.
+        const streamRes = await fetch(directDownloadUrl);
+        if (!streamRes.ok) throw new Error('Failed to download video stream');
+        const rawBlob = await streamRes.blob();
+        const remuxed = await remuxToPlayableMp4(rawBlob);
+        const blob = new Blob([remuxed], { type: 'video/mp4' });
+        const blobUrl = URL.createObjectURL(blob);
+
         const link = document.createElement('a');
-        link.href = directDownloadUrl;
+        link.href = blobUrl;
         const cleanTitle = (video.title || `youtube_video_${i + 1}`).replace(/[^a-z0-9]/gi, '_').toLowerCase();
         link.setAttribute('download', `${cleanTitle}.mp4`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
       } catch (err) {
         console.error(`Failed to download video ${video.id}:`, err);
         // Fallback
@@ -498,10 +508,11 @@ export default function YoutubePage() {
           if (!blobRes.ok) throw new Error('Failed to download video stream');
 
           const rawBlob = await blobRes.blob();
-          // Re-wrap with an explicit MP4 mime type so mobile players/gallery
-          // apps correctly parse the container metadata (duration) instead of
-          // treating it as an opaque octet-stream and showing 0:00.
-          const blob = new Blob([rawBlob], { type: 'video/mp4' });
+          // Cobalt tunnels return a fragmented MP4 whose mvhd duration is 0
+          // (shows as 0:00 on phones). Remux to a progressive MP4 so the real
+          // duration is written. Falls back to the raw stream if remux fails.
+          const remuxed = await remuxToPlayableMp4(rawBlob);
+          const blob = new Blob([remuxed], { type: 'video/mp4' });
           const blobUrl = URL.createObjectURL(blob);
           
           setDownloadProgress(100);
@@ -555,8 +566,10 @@ export default function YoutubePage() {
       if (!response.ok) throw new Error('Failed to download video stream');
 
       const rawBlob = await response.blob();
-      // Explicit MP4 mime type so mobile gallery parses duration (not 0:00).
-      const blob = new Blob([rawBlob], { type: 'video/mp4' });
+      // Remux fragmented MP4 -> progressive MP4 so the phone shows the real
+      // duration instead of 0:00 (falls back to raw stream on failure).
+      const remuxed = await remuxToPlayableMp4(rawBlob);
+      const blob = new Blob([remuxed], { type: 'video/mp4' });
       const blobUrl = URL.createObjectURL(blob);
       
       const a = document.createElement('a');
