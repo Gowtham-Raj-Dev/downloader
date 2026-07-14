@@ -496,8 +496,12 @@ export default function YoutubePage() {
           // because the raw Cobalt tunnel lacks a Content-Length header.
           const blobRes = await fetch(directDownloadUrl);
           if (!blobRes.ok) throw new Error('Failed to download video stream');
-          
-          const blob = await blobRes.blob();
+
+          const rawBlob = await blobRes.blob();
+          // Re-wrap with an explicit MP4 mime type so mobile players/gallery
+          // apps correctly parse the container metadata (duration) instead of
+          // treating it as an opaque octet-stream and showing 0:00.
+          const blob = new Blob([rawBlob], { type: 'video/mp4' });
           const blobUrl = URL.createObjectURL(blob);
           
           setDownloadProgress(100);
@@ -549,8 +553,10 @@ export default function YoutubePage() {
       // because the raw Cobalt tunnel lacks a Content-Length header.
       const response = await fetch(video.videoUrl);
       if (!response.ok) throw new Error('Failed to download video stream');
-      
-      const blob = await response.blob();
+
+      const rawBlob = await response.blob();
+      // Explicit MP4 mime type so mobile gallery parses duration (not 0:00).
+      const blob = new Blob([rawBlob], { type: 'video/mp4' });
       const blobUrl = URL.createObjectURL(blob);
       
       const a = document.createElement('a');

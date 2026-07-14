@@ -17,7 +17,16 @@ export async function POST(request: NextRequest) {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ url, videoQuality }),
+      // Force h264 so Cobalt returns a proper progressive MP4 with a readable
+      // duration/moov atom. Without it Cobalt may hand back a remuxed VP9/AV1
+      // stream whose metadata mobile players can't parse -> 0:00 duration.
+      body: JSON.stringify({
+        url,
+        videoQuality,
+        youtubeVideoCodec: 'h264',
+        downloadMode: 'auto',
+        filenameStyle: 'basic'
+      }),
       signal: AbortSignal.timeout(6000)
     });
 
