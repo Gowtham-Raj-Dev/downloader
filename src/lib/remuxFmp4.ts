@@ -15,10 +15,17 @@
  */
 import type { FFmpeg } from '@ffmpeg/ffmpeg';
 
-// ffmpeg-core single-threaded build works without SharedArrayBuffer /
-// cross-origin isolation (COOP/COEP), which we can't guarantee on mobile.
-const CORE_VERSION = '0.12.10';
-const CORE_BASE_URL = `https://unpkg.com/@ffmpeg/core@${CORE_VERSION}/dist/umd`;
+// The ffmpeg core (single-threaded UMD build) is self-hosted under
+// /public/ffmpeg so we don't depend on a CDN at runtime (avoids CSP blocks and
+// mobile network flakiness). The single-threaded core works without
+// SharedArrayBuffer / cross-origin isolation (COOP/COEP), which we can't
+// guarantee on mobile browsers.
+//
+// We intentionally do NOT pass classWorkerURL: turbopack (this project's
+// bundler) understands `new Worker(new URL('./worker.js', import.meta.url))`
+// and bundles @ffmpeg/ffmpeg's worker itself. Pointing classWorkerURL at the
+// package's pre-split webpack chunk instead breaks with "Cannot find module".
+const FFMPEG_BASE = '/ffmpeg';
 
 let ffmpegPromise: Promise<FFmpeg> | null = null;
 
@@ -29,8 +36,8 @@ async function getFFmpeg(): Promise<FFmpeg> {
       const { toBlobURL } = await import('@ffmpeg/util');
       const ffmpeg = new FFmpeg();
       await ffmpeg.load({
-        coreURL: await toBlobURL(`${CORE_BASE_URL}/ffmpeg-core.js`, 'text/javascript'),
-        wasmURL: await toBlobURL(`${CORE_BASE_URL}/ffmpeg-core.wasm`, 'application/wasm'),
+        coreURL: await toBlobURL(`${FFMPEG_BASE}/ffmpeg-core.js`, 'text/javascript'),
+        wasmURL: await toBlobURL(`${FFMPEG_BASE}/ffmpeg-core.wasm`, 'application/wasm'),
       });
       return ffmpeg;
     })().catch((err) => {
