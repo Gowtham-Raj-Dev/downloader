@@ -1,4 +1,4 @@
-export type Platform = 'instagram' | 'youtube' | 'pinterest';
+export type Platform = 'instagram' | 'pinterest';
 export type ActionType = 'single' | 'multi';
 export type Action = 'fetch' | 'download';
 

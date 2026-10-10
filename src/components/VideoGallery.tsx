@@ -285,7 +285,7 @@ export default function VideoGallery({ videos, onPreview, hideFilters = false }:
 
                 {/* Duration Tag */}
                 <span className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-[10px] font-bold text-white px-2 py-0.5 rounded border border-white/10 select-none">
-                  {video.exactDuration || video.duration}
+                  {video.duration}
                 </span>
 
                 {/* Type Tag */}
@@ -333,7 +333,7 @@ export default function VideoGallery({ videos, onPreview, hideFilters = false }:
 
                   {/* Copy link */}
                   <button
-                    onClick={(e) => handleCopyLink(video.id, video.instagramUrl || video.youtubeUrl || video.pinterestUrl || video.videoUrl, e)}
+                    onClick={(e) => handleCopyLink(video.id, video.instagramUrl || video.pinterestUrl || video.videoUrl, e)}
                     className="p-2 rounded-button bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/60 dark:hover:bg-neutral-800/90 text-neutral-600 dark:text-neutral-300 border border-neutral-200/40 dark:border-neutral-800/60 transition-colors flex items-center justify-center cursor-pointer relative"
                     title="Copy Instagram link"
                   >
@@ -433,7 +433,7 @@ export default function VideoGallery({ videos, onPreview, hideFilters = false }:
                         Preview
                       </button>
                       <button
-                        onClick={(e) => handleCopyLink(video.id, video.instagramUrl || video.youtubeUrl || video.pinterestUrl || video.videoUrl, e)}
+                        onClick={(e) => handleCopyLink(video.id, video.instagramUrl || video.pinterestUrl || video.videoUrl, e)}
                         className="p-2 rounded-button bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-900/60 dark:hover:bg-neutral-800/90 text-neutral-600 dark:text-neutral-300 border border-neutral-200/40 dark:border-neutral-800/60 transition-colors cursor-pointer"
                         title="Copy Link"
                       >

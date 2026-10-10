@@ -1,8 +1,10 @@
 import { Metadata } from 'next';
+import { pageMetadata, toolJsonLd } from '@/lib/site';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Pinterest Multi Image Downloader - Batch Download Pinterest Pictures",
   description: "Best Pinterest Multi Image Downloader. Download multiple Pinterest pictures, pins, and photos at once for free. Batch download high-quality Pinterest images easily.",
+  path: "/pinterest/image/multi-url",
   keywords: [
     "pinterest multi image downloader",
     "batch pinterest image downloader",
@@ -12,30 +14,17 @@ export const metadata: Metadata = {
     "bulk pinterest image download",
     "pinterest image batch downloader"
   ],
-  openGraph: {
-    title: "Pinterest Multi Image Downloader - Batch Download Pinterest Pictures",
-    description: "Best Pinterest Multi Image Downloader. Download multiple Pinterest pictures, pins, and photos at once for free. Batch download high-quality Pinterest images easily.",
-    url: "https://downloader.codelove.in/pinterest/image/multi-url",
-  },
-  alternates: {
-    canonical: "https://downloader.codelove.in/pinterest/image/multi-url",
-  }
-};
+});
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "Pinterest Multi Image Downloader",
-  "url": "https://downloader.codelove.in/pinterest/image/multi-url",
-  "description": "Best Pinterest Multi Image Downloader to download multiple high-quality Pinterest pictures and pins for free.",
-  "applicationCategory": "UtilitiesApplication",
-  "operatingSystem": "All",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  }
-};
+const jsonLd = toolJsonLd({
+  name: "Pinterest Multi Image Downloader",
+  description: "Best Pinterest Multi Image Downloader to download multiple high-quality Pinterest pictures and pins for free.",
+  path: "/pinterest/image/multi-url",
+  crumbs: [
+    { name: "Pinterest Image Downloader", path: "/pinterest/image" },
+    { name: "Multiple Links", path: "/pinterest/image/multi-url" },
+  ],
+});
 
 export default function PinterestMultiImageLayout({
   children,

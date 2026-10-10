@@ -1,6 +1,0 @@
-User-Agent: *
-Allow: /
-Disallow: /api/
-Disallow: /private/
-
-Sitemap: https://downloader.codelove.in/sitemap.xml

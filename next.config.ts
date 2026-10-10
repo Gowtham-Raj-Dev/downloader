@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  // The YouTube tools were removed; send their old URLs to the home page instead of a 404.
+  async redirects() {
+    return [
+      { source: "/youtube", destination: "/", permanent: true },
+      { source: "/youtube/:path*", destination: "/", permanent: true },
+    ];
+  },
   // async rewrites() {
   //   return [
   //     {

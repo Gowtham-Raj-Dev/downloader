@@ -1,8 +1,10 @@
 import { Metadata } from 'next';
+import { pageMetadata, toolJsonLd } from '@/lib/site';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Pinterest Multi Video Downloader - Download Multiple Pinterest Videos",
   description: "Best Pinterest Multi Video Downloader. Download multiple Pinterest videos, reels, and pins at once for free. Batch download high-quality Pinterest media easily.",
+  path: "/pinterest/video/multi-url",
   keywords: [
     "pinterest multi video downloader",
     "batch pinterest downloader",
@@ -12,30 +14,17 @@ export const metadata: Metadata = {
     "bulk pinterest download",
     "pinterest batch downloader"
   ],
-  openGraph: {
-    title: "Pinterest Multi Video Downloader - Batch Download Pinterest Videos",
-    description: "Best Pinterest Multi Video Downloader. Download multiple Pinterest videos, reels, and pins at once for free. Batch download high-quality Pinterest media easily.",
-    url: "https://downloader.codelove.in/pinterest/multi-url",
-  },
-  alternates: {
-    canonical: "https://downloader.codelove.in/pinterest/multi-url",
-  }
-};
+});
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "Pinterest Multi Video Downloader",
-  "url": "https://downloader.codelove.in/pinterest/multi-url",
-  "description": "Best Pinterest Multi Video Downloader to download multiple high-quality Pinterest videos and reels for free.",
-  "applicationCategory": "UtilitiesApplication",
-  "operatingSystem": "All",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  }
-};
+const jsonLd = toolJsonLd({
+  name: "Pinterest Multi Video Downloader",
+  description: "Best Pinterest Multi Video Downloader to download multiple high-quality Pinterest videos and reels for free.",
+  path: "/pinterest/video/multi-url",
+  crumbs: [
+    { name: "Pinterest Video Downloader", path: "/pinterest/video" },
+    { name: "Multiple Links", path: "/pinterest/video/multi-url" },
+  ],
+});
 
 export default function PinterestMultiLayout({
   children,

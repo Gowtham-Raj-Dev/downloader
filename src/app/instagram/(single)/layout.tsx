@@ -1,8 +1,10 @@
 import { Metadata } from 'next';
+import { pageMetadata, toolJsonLd } from '@/lib/site';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Insta Downloader - Free Instagram Video & Reels Downloader",
   description: "Best Insta Downloader to download high-quality Instagram videos, Reels, and photos for free. Download single or multiple Instagram videos (batch & multi-URL) instantly.",
+  path: "/instagram",
   keywords: [
     "insta downloader",
     "insta downloader free",
@@ -20,30 +22,14 @@ export const metadata: Metadata = {
     "insta reels downloader",
     "instagram photo downloader"
   ],
-  openGraph: {
-    title: "Insta Downloader - Free Instagram Video & Reels Downloader",
-    description: "Best Insta Downloader to download high-quality Instagram videos, Reels, and photos for free. Download single or multiple Instagram videos (batch & multi-URL) instantly.",
-    url: "https://downloader.codelove.in/instagram",
-  },
-  alternates: {
-    canonical: "https://downloader.codelove.in/instagram",
-  }
-};
+});
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "Insta Downloader",
-  "url": "https://downloader.codelove.in/instagram",
-  "description": "Best Insta Downloader to download high-quality Instagram videos, Reels, and photos for free.",
-  "applicationCategory": "MultimediaApplication",
-  "operatingSystem": "All",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  }
-};
+const jsonLd = toolJsonLd({
+  name: "Insta Downloader",
+  description: "Best Insta Downloader to download high-quality Instagram videos, Reels, and photos for free.",
+  path: "/instagram",
+  crumbs: [{ name: "Instagram Downloader", path: "/instagram" }],
+});
 
 export default function InstagramLayout({
   children,

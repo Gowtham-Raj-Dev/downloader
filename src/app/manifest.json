@@ -1,16 +1,16 @@
 {
-  "name": "CodeLove Free Video Downloader",
-  "short_name": "CodeLove",
-  "description": "Best free video downloader online. Fast, responsive, and free insta downloader and YouTube downloader tool.",
+  "name": "CodeLove Downloader",
+  "short_name": "Downloader",
+  "description": "Free online downloader for public Instagram videos and Reels and Pinterest videos and images.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
   "icons": [
     {
-      "src": "/icon",
-      "sizes": "32x32",
-      "type": "image/png"
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
     }
   ]
 }

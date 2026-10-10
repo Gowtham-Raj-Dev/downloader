@@ -11,7 +11,6 @@ export interface VideoItem {
   type: 'reel' | 'video';
   instagramUrl?: string;
   pinterestUrl?: string;
-  youtubeUrl?: string;
 }
 
 export interface ProfileData {

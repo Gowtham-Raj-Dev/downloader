@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Heart, Code } from 'lucide-react';
+import { CODELOVE_NETWORK } from '@/lib/site';
 
 export default function Footer() {
   return (
@@ -14,7 +15,13 @@ export default function Footer() {
           </p>
         </div>
         <div className="flex flex-col items-center md:items-end gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-500">
-          <div className="flex gap-4">
+          <div className="flex flex-wrap justify-center md:justify-end gap-x-4 gap-y-2">
+            <Link href="/about" className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors">
+              About
+            </Link>
+            <Link href="/contact" className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors">
+              Contact
+            </Link>
             <Link href="/privacy" className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors">
               Privacy Policy
             </Link>
@@ -37,6 +44,16 @@ export default function Footer() {
           </div>
         </div>
       </div>
+
+      {/* More from CodeLove */}
+      <nav aria-label="More from CodeLove" className="max-w-6xl mx-auto mt-6 pt-5 border-t border-neutral-200/50 dark:border-neutral-800/30 flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 text-xs font-semibold text-neutral-500 dark:text-neutral-500">
+        <span className="text-neutral-400 dark:text-neutral-500 font-normal">More from CodeLove:</span>
+        {CODELOVE_NETWORK.map((site) => (
+          <a key={site.href} href={site.href} className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors">
+            {site.name}
+          </a>
+        ))}
+      </nav>
     </footer>
   );
 }

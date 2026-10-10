@@ -70,7 +70,7 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
 
   const handleCopyLink = async () => {
     try {
-      const urlToCopy = video.instagramUrl || video.pinterestUrl || video.youtubeUrl || window.location.href;
+      const urlToCopy = video.instagramUrl || video.pinterestUrl || window.location.href;
       await navigator.clipboard.writeText(urlToCopy);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
@@ -150,7 +150,7 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
             ) : isImage ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
-                src={video.videoUrl.startsWith('http') && !video.videoUrl.includes('/api/video/stream') && !video.videoUrl.includes('/api/youtube/proxy') ? `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}` : video.videoUrl}
+                src={video.videoUrl.startsWith('http') && !video.videoUrl.includes('/api/video/stream') ?`/api/video/stream?url=${encodeURIComponent(video.videoUrl)}` : video.videoUrl}
                 alt="Media Preview"
                 className="w-full h-full object-contain"
                 referrerPolicy="no-referrer"
@@ -159,7 +159,7 @@ export default function PreviewModal({ video, videoIndex = 1, isOpen, onClose }:
             ) : (
               <video
                 ref={videoRef}
-                src={video.videoUrl.startsWith('http') && !video.videoUrl.includes('/api/video/stream') && !video.videoUrl.includes('/api/youtube/proxy') ? `/api/video/stream?url=${encodeURIComponent(video.videoUrl)}` : video.videoUrl}
+                src={video.videoUrl.startsWith('http') && !video.videoUrl.includes('/api/video/stream') ?`/api/video/stream?url=${encodeURIComponent(video.videoUrl)}` : video.videoUrl}
                 loop
                 playsInline
                 className="w-full h-full object-contain cursor-pointer"

@@ -193,24 +193,6 @@ body {
   animation: shiny-text 4s linear infinite;
 }
 
-.shine-youtube {
-  background: linear-gradient(
-    to right,
-    #dc2626 0%,    
-    #f97316 20%,   
-    #dc2626 40%,   
-    #ffffff 50%,   
-    #dc2626 60%,   
-    #f97316 80%,   
-    #dc2626 100%   
-  );
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shiny-text 4s linear infinite;
-}
-
 .shine-pinterest {
   background: linear-gradient(
     to right,

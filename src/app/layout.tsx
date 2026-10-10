@@ -1,57 +1,61 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
+import { ADSENSE_CLIENT } from "@/lib/adsense";
+import { MAIN_SITE_URL, OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 
+const TITLE = "Free Instagram & Pinterest Downloader - Videos, Reels & Images";
+const DESCRIPTION = "Free online downloader for public Instagram videos and Reels and Pinterest videos and images. No sign-up, no watermark, with multi-link batch downloads.";
+
+// Defaults only. Each page sets its own title, description and canonical through pageMetadata().
 export const metadata: Metadata = {
-  metadataBase: new URL('https://downloader.codelove.in'),
+  metadataBase: new URL(SITE_URL),
   title: {
-    template: "%s | Insta Downloader & Video Downloader Hub",
-    default: "Free Video Downloader - Insta Downloader & YouTube Loader",
+    template: "%s | CodeLove",
+    default: TITLE,
   },
-  description: "Best free video downloader online. Fast, responsive, and free insta downloader and YouTube downloader tool. Download public Instagram videos, reels, and YouTube shorts instantly.",
+  description: DESCRIPTION,
   keywords: [
     "free downloader",
     "free video downloader",
     "insta downloader",
     "insta downloader free",
     "instagram downloader",
-    "youtube downloader",
     "instagram reels downloader",
     "download instagram video",
-    "instagram lodader",
     "free insta videos download",
+    "pinterest downloader",
+    "pinterest video downloader",
+    "pinterest image downloader",
     "multi url video downloader",
     "bulk downloader",
     "batch video download",
     "video download online free"
   ],
-  authors: [{ name: "CodeLove Team", url: "https://downloader.codelove.in" }],
+  applicationName: SITE_NAME,
+  authors: [{ name: "CodeLove", url: MAIN_SITE_URL }],
   creator: "CodeLove",
   publisher: "CodeLove",
+  category: "technology",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  alternates: {
-    canonical: '/',
-    languages: {
-      'en-US': '/en-US',
-    },
-  },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://downloader.codelove.in/",
-    title: "Free Video Downloader - Insta Downloader & YouTube Loader",
-    description: "Best free video downloader online. Fast, responsive, and free insta downloader and YouTube downloader tool. Download public Instagram videos, reels, and YouTube shorts instantly.",
-    siteName: "CodeLove Downloader",
+    url: SITE_URL,
+    title: TITLE,
+    description: DESCRIPTION,
+    siteName: SITE_NAME,
+    images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free Video Downloader - Insta Downloader & YouTube Loader",
-    description: "Best free video downloader online. Fast, responsive, and free insta downloader and YouTube downloader tool.",
-    creator: "@codelove",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [OG_IMAGE.url],
   },
   robots: {
     index: true,
@@ -68,15 +72,23 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "CodeLove Free Video Downloader",
-  "url": "https://downloader.codelove.in",
-  "description": "Best free video downloader online. Fast, responsive, and free insta downloader and YouTube downloader tool.",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https://downloader.codelove.in/?q={search_term_string}",
-    "query-input": "required name=search_term_string"
-  }
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${MAIN_SITE_URL}/#organization`,
+      "name": "CodeLove",
+      "url": MAIN_SITE_URL
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      "name": SITE_NAME,
+      "url": SITE_URL,
+      "description": DESCRIPTION,
+      "inLanguage": "en",
+      "publisher": { "@id": `${MAIN_SITE_URL}/#organization` }
+    }
+  ]
 };
 
 export default function RootLayout({
@@ -89,6 +101,17 @@ export default function RootLayout({
       <head>
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+        {/* Google AdSense - only rendered once a publisher ID is set in src/lib/adsense.ts */}
+        {ADSENSE_CLIENT ? (
+          <>
+            <meta name="google-adsense-account" content={ADSENSE_CLIENT} />
+            <script
+              async
+              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+              crossOrigin="anonymous"
+            />
+          </>
+        ) : null}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

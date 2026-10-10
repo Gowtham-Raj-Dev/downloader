@@ -12,11 +12,10 @@ export default function Header() {
 
   const isHome = pathname === '/';
   const isInstagram = pathname.startsWith('/instagram');
-  const isYoutube = pathname.startsWith('/youtube');
   const isPinterest = pathname.startsWith('/pinterest');
 
   // Helper to determine if we are in platform
-  const isPlatform = isInstagram || isYoutube || isPinterest;
+  const isPlatform = isInstagram || isPinterest;
 
   const [isPlatformOpen, setIsPlatformOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -45,18 +44,16 @@ export default function Header() {
           <Link href="/" className="flex items-center gap-2 select-none group">
             <div className={`p-2 rounded-xl text-white shadow-md transition-all duration-300 ${isInstagram
               ? 'bg-gradient-to-tr from-instagram-purple via-instagram-pink to-instagram-orange'
-              : isYoutube
-                ? 'bg-gradient-to-tr from-red-700 via-red-600 to-rose-500'
-                : isPinterest
-                  ? 'bg-gradient-to-tr from-[#E60023] via-red-600 to-[#E60023]'
-                  : 'bg-gradient-to-tr from-rose-600 via-pink-600 to-orange-500'
+              : isPinterest
+                ? 'bg-gradient-to-tr from-[#E60023] via-red-600 to-[#E60023]'
+                : 'bg-gradient-to-tr from-rose-600 via-pink-600 to-orange-500'
               }`}>
               <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </div>
             <div className="text-left">
-              <h1 className="text-base font-extrabold tracking-tight text-neutral-900 dark:text-white leading-none">
+              <span className="block text-base font-extrabold tracking-tight text-neutral-900 dark:text-white leading-none">
                 Downloader
-              </h1>
+              </span>
               <span className="text-[10px] font-semibold text-neutral-500 dark:text-zinc-400">
                 Free Download Tool
               </span>
@@ -107,16 +104,6 @@ export default function Header() {
                 </Link>
                 <Link href="/instagram/multi-url" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
                   Multi Instagram Downloader
-                </Link>
-                <div className="h-px w-full bg-neutral-100 dark:bg-zinc-800/50 my-1"></div>
-                <Link href="/youtube" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
-                  YouTube Downloader
-                </Link>
-                <Link href="/youtube/multi-url" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
-                  Multi YouTube Downloader
-                </Link>
-                <Link href="/youtube/description-extractor" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">
-                  YouTube Description Extractor
                 </Link>
                 <div className="h-px w-full bg-neutral-100 dark:bg-zinc-800/50 my-1"></div>
                 <Link href="/pinterest/video" onClick={handleLinkClick} className="px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-zinc-800/50 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-colors">

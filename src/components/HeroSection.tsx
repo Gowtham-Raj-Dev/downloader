@@ -20,7 +20,6 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
   const isBatch = pathname?.includes('/multi-url');
   const basePath = isBatch ? pathname.replace('/multi-url', '') : pathname;
 
-  const isYoutube = pathname?.includes('/youtube');
   const isPinterest = pathname?.includes('/pinterest');
   const isPinterestImage = pathname?.includes('/pinterest/image');
 
@@ -103,8 +102,8 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
       >
         Free{' '}
         {isBatch ? 'Multiple ' : ''}
-        <span className={isPinterest ? "shine-pinterest" : isYoutube ? "shine-youtube" : "shine-insta"}>
-          {isPinterest ? (isPinterestImage ? "Pinterest Image" : "Pinterest Video") : isYoutube ? "YouTube Video" : "Instagram Video"}{isBatch ? 's' : ''}
+        <span className={isPinterest ? "shine-pinterest" : "shine-insta"}>
+          {isPinterest ? (isPinterestImage ? "Pinterest Image" : "Pinterest Video") : "Instagram Video"}{isBatch ? 's' : ''}
         </span>{' '}
         Downloader
       </motion.h1>
@@ -115,7 +114,7 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
         transition={{ duration: 0.6, delay: 0.2 }}
         className="text-base md:text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto mb-10 leading-relaxed font-normal"
       >
-        Paste any {isPinterest ? "Pinterest pin" : isYoutube ? "YouTube video" : "Instagram Reel or Video"} link and instantly fetch, {isPinterestImage ? "view" : "play"}, and download your media.
+        Paste any {isPinterest ? "Pinterest pin" : "Instagram Reel or Video"} link and instantly fetch, {isPinterestImage ? "view" : "play"}, and download your media.
       </motion.p>
 
       {error && (
@@ -170,7 +169,7 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder={`Paste ${isPinterest ? (isPinterestImage ? 'Pinterest image or pin' : 'Pinterest video or reel') : isYoutube ? 'YouTube Shorts' : 'Instagram'} URL`}
+                placeholder={`Paste ${isPinterest ? (isPinterestImage ? 'Pinterest image or pin' : 'Pinterest video or reel') : 'Instagram'} URL`}
                 className="w-full pl-11 pr-24 py-3.5 bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-instagram-pink/50 dark:focus:ring-instagram-orange/50 transition-all text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 dark:placeholder-neutral-600"
                 disabled={isLoading}
               />
@@ -211,7 +210,7 @@ export default function HeroSection({ onFetch, isLoading, error, isPremiumFeatur
                       type="text"
                       value={field}
                       onChange={(e) => handleFieldChange(index, e.target.value)}
-                      placeholder={`Paste ${isPinterest ? (isPinterestImage ? 'Pinterest image or pin' : 'Pinterest video or reel') : isYoutube ? 'YouTube Shorts' : 'Instagram'} URL #${index + 1}`}
+                      placeholder={`Paste ${isPinterest ? (isPinterestImage ? 'Pinterest image or pin' : 'Pinterest video or reel') : 'Instagram'} URL #${index + 1}`}
                       className="w-full pl-10 pr-20 py-3 bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 rounded-button text-sm focus:outline-none focus:ring-2 focus:ring-instagram-pink/50 dark:focus:ring-instagram-orange/50 transition-all text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 dark:placeholder-neutral-600"
                       disabled={isLoading}
                     />
