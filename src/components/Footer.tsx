@@ -53,6 +53,12 @@ export default function Footer() {
             {site.name}
           </a>
         ))}
+        <a href="https://codelove.in" aria-label="CodeLove — codelove.in" className="block w-fit max-md:basis-full max-md:mx-auto max-md:mt-2 md:ml-auto">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/codelove/codelove-footer-on-light.png" alt="CodeLove" width={704} height={144} loading="lazy" className="h-12 w-auto [.dark_&]:hidden" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/codelove/codelove-footer-on-dark.png" alt="CodeLove" width={704} height={144} loading="lazy" className="hidden h-12 w-auto [.dark_&]:block" />
+        </a>
       </nav>
     </footer>
   );
