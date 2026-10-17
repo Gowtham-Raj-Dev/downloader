@@ -20,6 +20,7 @@ export const CODELOVE_NETWORK = [
   { name: '3D Models', href: 'https://models.codelove.in' },
   { name: 'Video to GIF', href: 'https://videotogif.codelove.in' },
   { name: 'Video to Images', href: 'https://videotoimages.codelove.in' },
+  { name: '3D Games', href: 'https://games.codelove.in' },
 ];
 
 interface PageMeta {

@@ -30,7 +30,14 @@ export const metadata: Metadata = {
     "multi url video downloader",
     "bulk downloader",
     "batch video download",
-    "video download online free"
+    "video download online free",
+    "reels downloader",
+    "instagram photo downloader",
+    "pinterest video download",
+    "save instagram reels",
+    "download reels without watermark",
+    "codelove downloader",
+    "codelove"
   ],
   applicationName: SITE_NAME,
   authors: [{ name: "CodeLove", url: MAIN_SITE_URL }],
