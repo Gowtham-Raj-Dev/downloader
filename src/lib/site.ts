@@ -16,11 +16,17 @@ export const OG_IMAGE = {
 // Other CodeLove sites, linked from the footer.
 export const CODELOVE_NETWORK = [
   { name: 'CodeLove', href: 'https://codelove.in' },
+  { name: 'Free 3D Models', href: 'https://models.codelove.in' },
+  { name: 'Free 3D Games', href: 'https://games.codelove.in' },
   { name: 'Link in Bio', href: 'https://linkinbio.codelove.in' },
-  { name: '3D Models', href: 'https://models.codelove.in' },
   { name: 'Video to GIF', href: 'https://videotogif.codelove.in' },
   { name: 'Video to Images', href: 'https://videotoimages.codelove.in' },
-  { name: '3D Games', href: 'https://games.codelove.in' },
+];
+
+// Related guides on the main CodeLove site, linked from the footer.
+export const CODELOVE_GUIDES = [
+  { name: 'Complete Instagram downloader guide', href: 'https://codelove.in/learn/guide/complete-instagram-downloader-guide' },
+  { name: 'How to download Pinterest videos and images', href: 'https://codelove.in/learn/guide/how-to-download-pinterest-videos-and-images' },
 ];
 
 interface PageMeta {

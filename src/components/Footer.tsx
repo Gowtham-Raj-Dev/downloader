@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Heart, Code } from 'lucide-react';
-import { CODELOVE_NETWORK } from '@/lib/site';
+import { CODELOVE_GUIDES, CODELOVE_NETWORK } from '@/lib/site';
 
 export default function Footer() {
   return (
@@ -45,14 +45,26 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* More from CodeLove */}
-      <nav aria-label="More from CodeLove" className="max-w-6xl mx-auto mt-6 pt-5 border-t border-neutral-200/50 dark:border-neutral-800/30 flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 text-xs font-semibold text-neutral-500 dark:text-neutral-500">
-        <span className="text-neutral-400 dark:text-neutral-500 font-normal">More from CodeLove:</span>
-        {CODELOVE_NETWORK.map((site) => (
-          <a key={site.href} href={site.href} className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors">
-            {site.name}
-          </a>
-        ))}
+      {/* CodeLove network + related guides */}
+      <nav aria-label="CodeLove network" className="max-w-6xl mx-auto mt-6 pt-5 border-t border-neutral-200/50 dark:border-neutral-800/30 flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 text-xs font-semibold text-neutral-500 dark:text-neutral-500">
+        <div className="flex flex-col gap-2 items-center md:items-start">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2">
+            <span className="text-neutral-400 dark:text-neutral-500 font-normal">CodeLove network:</span>
+            {CODELOVE_NETWORK.map((site) => (
+              <a key={site.href} href={site.href} className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors">
+                {site.name}
+              </a>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2">
+            <span className="text-neutral-400 dark:text-neutral-500 font-normal">Guides:</span>
+            {CODELOVE_GUIDES.map((guide) => (
+              <a key={guide.href} href={guide.href} className="hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors">
+                {guide.name}
+              </a>
+            ))}
+          </div>
+        </div>
         <a href="https://codelove.in" aria-label="CodeLove — codelove.in" className="block w-fit max-md:basis-full max-md:mx-auto max-md:mt-2 md:ml-auto">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/codelove/codelove-footer-on-light.png" alt="CodeLove" width={704} height={144} loading="lazy" className="h-12 w-auto [.dark_&]:hidden" />
