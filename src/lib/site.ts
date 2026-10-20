@@ -22,7 +22,7 @@ export const CODELOVE_NETWORK = [
   { name: 'Video to GIF', href: 'https://videotogif.codelove.in' },
   { name: 'Video to Images', href: 'https://videotoimages.codelove.in' },
   { name: 'Free YouTube Automation', href: 'https://utubeflow.codelove.in' },
-  { name: 'Free Java Games', href: 'https://javagames-emu.codelove.in' },
+  { name: 'Free Java Games', href: 'https://javaplay.codelove.in' },
 ];
 
 // Related guides on the main CodeLove site, linked from the footer.
