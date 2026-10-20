@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Heart, Code } from 'lucide-react';
+import HeartButton from '@/components/HeartButton';
 import { CODELOVE_GUIDES, CODELOVE_NETWORK } from '@/lib/site';
 
 export default function Footer() {
@@ -37,10 +37,14 @@ export default function Footer() {
             . All rights reserved.
           </span>
           <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 flex items-center justify-center md:justify-end gap-1.5">
-            Developed with <Heart className="w-3.5 h-3.5 text-red-500 fill-current" /><Code className="w-4 h-4 text-indigo-500" /> by{' '}
-            <Link href="https://gowtham.codelove.in" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors font-semibold underline underline-offset-2">
+            Built with <HeartButton /> by{' '}
+            <a href="https://gowtham.codelove.in" target="_blank" rel="noopener noreferrer" className="font-medium text-neutral-800 dark:text-neutral-200 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">
               Gowtham
-            </Link>
+            </a>
+            <span aria-hidden="true">·</span>
+            <a href="https://codelove.in" target="_blank" rel="noopener noreferrer" className="font-medium text-neutral-800 dark:text-neutral-200 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">
+              CodeLove
+            </a>
           </div>
         </div>
       </div>
