@@ -4,7 +4,7 @@ import { CONTACT_EMAIL, pageMetadata } from '@/lib/site';
 
 export const metadata: Metadata = pageMetadata({
   title: 'Contact',
-  description: 'Get in touch with the CodeLove Downloader team for support, bug reports, feedback or copyright concerns.',
+  description: 'Get in touch with the Insta Downloader team for support, bug reports, feedback or copyright concerns.',
   path: '/contact',
 });
 

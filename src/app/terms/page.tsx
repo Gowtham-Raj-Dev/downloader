@@ -4,7 +4,7 @@ import { CONTACT_EMAIL, pageMetadata } from '@/lib/site';
 
 export const metadata: Metadata = pageMetadata({
   title: 'Terms & Conditions',
-  description: 'The terms for using CodeLove Downloader, including acceptable use, copyright responsibilities and limits of liability.',
+  description: 'The terms for using Insta Downloader, including acceptable use, copyright responsibilities and limits of liability.',
   path: '/terms',
 });
 
@@ -13,13 +13,13 @@ export default function TermsConditionsPage() {
     <InfoPage title="Terms & Conditions" lastUpdated="October 10, 2026">
       <InfoSection heading="1. Acceptance of Terms">
         <p>
-          By accessing and using CodeLove Downloader, you agree to be bound by these Terms and Conditions. If you disagree with any part of these terms, you may not access the service.
+          By accessing and using Insta Downloader, you agree to be bound by these Terms and Conditions. If you disagree with any part of these terms, you may not access the service.
         </p>
       </InfoSection>
 
       <InfoSection heading="2. Service Usage and Restrictions">
         <p>
-          CodeLove Downloader provides a tool to download publicly available Instagram and Pinterest media. You agree to use this service only for personal, non-commercial purposes. You are strictly prohibited from using our service to download copyrighted material without the explicit permission of the copyright owner.
+          Insta Downloader provides a tool to download publicly available Instagram and Pinterest media. You agree to use this service only for personal, non-commercial purposes. You are strictly prohibited from using our service to download copyrighted material without the explicit permission of the copyright owner.
         </p>
         <p>
           You may not use automated scripts to overload the service, attempt to access private or restricted content, or use the service in any way that breaks the law or the terms of the platform the media comes from.

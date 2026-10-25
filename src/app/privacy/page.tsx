@@ -4,7 +4,7 @@ import { CONTACT_EMAIL, pageMetadata } from '@/lib/site';
 
 export const metadata: Metadata = pageMetadata({
   title: 'Privacy Policy',
-  description: 'How CodeLove Downloader handles your data: what is collected, how cookies, analytics and advertising work, and the choices you have.',
+  description: 'How Insta Downloader handles your data: what is collected, how cookies, analytics and advertising work, and the choices you have.',
   path: '/privacy',
 });
 
@@ -13,7 +13,7 @@ export default function PrivacyPolicyPage() {
     <InfoPage title="Privacy Policy" lastUpdated="October 10, 2026">
       <InfoSection heading="1. Overview">
         <p>
-          CodeLove Downloader (downloader.codelove.in) is a free tool for saving publicly available Instagram and Pinterest media. This policy explains what information is processed when you use it. You can use every tool on this site without creating an account.
+          Insta Downloader (downloader.codelove.in) is a free tool for saving publicly available Instagram and Pinterest media. This policy explains what information is processed when you use it. You can use every tool on this site without creating an account.
         </p>
       </InfoSection>
 

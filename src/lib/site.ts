@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const SITE_URL = 'https://downloader.codelove.in';
-export const SITE_NAME = 'CodeLove Downloader';
+export const SITE_NAME = 'Insta Downloader by CodeLove';
 export const MAIN_SITE_URL = 'https://codelove.in';
 export const CONTACT_EMAIL = 'support@codelove.in';
 
@@ -10,7 +10,7 @@ export const OG_IMAGE = {
   url: '/og.png',
   width: 1200,
   height: 630,
-  alt: 'CodeLove Downloader - free Instagram and Pinterest downloader',
+  alt: 'Insta Downloader by CodeLove - free Instagram Reels, video and photo downloader',
 };
 
 // Other CodeLove sites, linked from the footer.
@@ -29,10 +29,13 @@ export const CODELOVE_NETWORK = [
 export const CODELOVE_GUIDES = [
   { name: 'Complete Instagram downloader guide', href: 'https://codelove.in/learn/guide/complete-instagram-downloader-guide' },
   { name: 'How to download Pinterest videos and images', href: 'https://codelove.in/learn/guide/how-to-download-pinterest-videos-and-images' },
+  { name: 'MP4 vs WebM vs MOV: video formats explained', href: 'https://codelove.in/learn/guide/best-video-formats-explained' },
+  { name: 'How to extract audio from a video as MP3', href: 'https://codelove.in/learn/guide/how-to-extract-audio-from-video-as-mp3' },
 ];
 
 interface PageMeta {
-  title: string;
+  /** A plain string goes through the root "%s | Insta Downloader" template; `{ absolute }` skips it. */
+  title: string | { absolute: string };
   description: string;
   /** Route path starting with "/", or "" for the home page. */
   path: string;
@@ -43,6 +46,7 @@ interface PageMeta {
 // A page that sets `openGraph` replaces the root layout's object, so everything is repeated here.
 export function pageMetadata({ title, description, path, keywords }: PageMeta): Metadata {
   const url = `${SITE_URL}${path}`;
+  const shareTitle = typeof title === 'string' ? title : title.absolute;
   return {
     title,
     description,
@@ -52,14 +56,14 @@ export function pageMetadata({ title, description, path, keywords }: PageMeta): 
       type: 'website',
       locale: 'en_US',
       siteName: SITE_NAME,
-      title,
+      title: shareTitle,
       description,
       url,
       images: [OG_IMAGE],
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: shareTitle,
       description,
       images: [OG_IMAGE.url],
     },

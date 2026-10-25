@@ -20,7 +20,7 @@ const CRAWLERS = [
 export function GET() {
   const rules = CRAWLERS.map((agent) => `User-agent: ${agent}\nAllow: /\nDisallow: /api/`).join('\n\n');
   const body = [
-    '# CodeLove Downloader is updated often. All pages are open to crawl; only /api/ is off limits.',
+    '# Insta Downloader is updated often. All pages are open to crawl; only /api/ is off limits.',
     '',
     rules,
     '',

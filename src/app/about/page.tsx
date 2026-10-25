@@ -3,17 +3,17 @@ import InfoPage, { InfoLink, InfoSection } from '@/components/InfoPage';
 import { MAIN_SITE_URL, pageMetadata } from '@/lib/site';
 
 export const metadata: Metadata = pageMetadata({
-  title: 'About CodeLove Downloader',
-  description: 'CodeLove Downloader is a free, no-sign-up tool for saving public Instagram videos and Reels and Pinterest videos and images. Learn what it does and who builds it.',
+  title: 'About Insta Downloader',
+  description: 'Insta Downloader is a free, no-sign-up tool for saving public Instagram videos and Reels and Pinterest videos and images. Learn what it does and who builds it.',
   path: '/about',
 });
 
 export default function AboutPage() {
   return (
-    <InfoPage title="About CodeLove Downloader">
+    <InfoPage title="About Insta Downloader">
       <InfoSection heading="What This Is">
         <p>
-          CodeLove Downloader is a free web tool for saving publicly available media from Instagram and Pinterest. Paste a link, press Fetch, preview the result, and download it. There is no account to create and nothing to install.
+          Insta Downloader is a free web tool for saving publicly available media from Instagram and Pinterest. Paste a link, press Fetch, preview the result, and download it. There is no account to create and nothing to install.
         </p>
       </InfoSection>
 
@@ -49,7 +49,7 @@ export default function AboutPage() {
 
       <InfoSection heading="Who Builds It">
         <p>
-          This downloader is part of <InfoLink href={MAIN_SITE_URL}>CodeLove</InfoLink>, a small collection of free online tools created by Gowtham. CodeLove Downloader is an independent project and is not affiliated with Instagram, Meta or Pinterest.
+          This downloader is part of <InfoLink href={MAIN_SITE_URL}>CodeLove</InfoLink>, a small collection of free online tools created by Gowtham. Insta Downloader is an independent project and is not affiliated with Instagram, Meta or Pinterest.
         </p>
         <p>
           Have a question or found a bug? Reach us through the <InfoLink href="/contact">contact page</InfoLink>.

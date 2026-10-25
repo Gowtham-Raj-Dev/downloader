@@ -4,14 +4,14 @@ import "./globals.css";
 import { ADSENSE_CLIENT } from "@/lib/adsense";
 import { MAIN_SITE_URL, OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 
-const TITLE = "Free Instagram & Pinterest Downloader - Videos, Reels & Images";
-const DESCRIPTION = "Free online downloader for public Instagram videos and Reels and Pinterest videos and images. No sign-up, no watermark, with multi-link batch downloads.";
+const TITLE = "Insta Downloader - Download Instagram Reels, Videos & Photos Free";
+const DESCRIPTION = "Free Insta Downloader: save public Instagram Reels, videos and photos in HD with no watermark and no login. Works on iPhone, Android and PC. Pinterest downloads too.";
 
 // Defaults only. Each page sets its own title, description and canonical through pageMetadata().
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    template: "%s | CodeLove",
+    template: "%s | Insta Downloader",
     default: TITLE,
   },
   description: DESCRIPTION,

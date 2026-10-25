@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ShieldCheck, Sparkles, Heart, Download, Eye, Copy, Check,
@@ -14,6 +14,7 @@ import DownloadAllModal from '@/components/DownloadAllModal';
 import LimitExceededModal from '@/components/LimitExceededModal';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import InstaGuide from '@/components/InstaGuide';
 import {
   isInstagramVideoUrl,
   extractVideoShortcode,
@@ -175,6 +176,8 @@ export default function InstagramPage() {
           caption: postInfo.caption || '',
           type: 'video',
           instagramUrl: url,
+          ownerUsername: postInfo.owner_username || '',
+          ownerUrl: postInfo.owner_url || '',
           uploadDate: 'Just now'
         } as VideoItem;
       });
@@ -218,6 +221,17 @@ export default function InstagramPage() {
       setIsLoading(false);
     }
   };
+
+  // The home page's link box sends the link here as ?url=…; fetch it straight away.
+  // Read from window.location rather than useSearchParams so the page stays statically renderable.
+  useEffect(() => {
+    const link = new URLSearchParams(window.location.search).get('url');
+    if (link) {
+      window.history.replaceState(null, '', window.location.pathname);
+      handleFetchProfile([link.trim()]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const executeDownloadAllDirect = async () => {
     const videosToDownload = fetchedVideos.length > 0 ? fetchedVideos : [];
@@ -375,6 +389,8 @@ export default function InstagramPage() {
                     </p>
                   </div>
                 </div>
+
+                <InstaGuide />
               </motion.div>
             )}
 
@@ -508,41 +524,72 @@ export default function InstagramPage() {
                   <div className="w-full md:w-[320px] p-6 flex flex-col justify-between bg-neutral-50/50 dark:bg-zinc-900/20 border-t md:border-t-0 md:border-l border-neutral-200/40 dark:border-neutral-800/40">
                     <div className="space-y-6">
                       <div>
-                        <span className="inline-flex px-2 py-0.5 rounded text-[9px] font-extrabold bg-green-500/10 text-green-500 border border-green-500/20 uppercase tracking-wider mb-2">
-                          Extracted Reel
+                        <span className="inline-flex px-2 py-0.5 rounded text-[9px] font-extrabold bg-green-500/10 text-green-500 border border-green-500/20 uppercase tracking-wider mb-3">
+                          {singleVideo.duration === 'Image' ? 'Photo ready' : 'Reel ready'}
                         </span>
-                        <h3 className="text-base font-extrabold text-neutral-900 dark:text-white">
-                          Media Found
-                        </h3>
-                        <span className="text-[10px] font-semibold font-mono text-neutral-400 dark:text-neutral-500">
-                          ID: {singleVideo.id}
-                        </span>
+                        {/* Who posted it, Instagram-style: avatar initial + @username */}
+                        {singleVideo.ownerUsername ? (
+                          <a
+                            href={singleVideo.ownerUrl || `https://www.instagram.com/${singleVideo.ownerUsername}/`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 group"
+                          >
+                            <span className="p-[2px] rounded-full bg-gradient-to-tr from-instagram-orange via-instagram-pink to-instagram-purple shrink-0">
+                              <span className="grid place-items-center w-10 h-10 rounded-full bg-white dark:bg-zinc-950 text-sm font-extrabold uppercase text-neutral-900 dark:text-white">
+                                {singleVideo.ownerUsername.replace(/[^a-z0-9]/gi, '').charAt(0) || '@'}
+                              </span>
+                            </span>
+                            <span className="min-w-0">
+                              <span className="block text-sm font-extrabold text-neutral-900 dark:text-white truncate group-hover:underline">
+                                @{singleVideo.ownerUsername}
+                              </span>
+                              <span className="block text-[11px] text-neutral-500 dark:text-neutral-400">
+                                {singleVideo.duration === 'Image' ? 'Instagram photo' : 'Instagram reel'}
+                              </span>
+                            </span>
+                          </a>
+                        ) : (
+                          <h3 className="text-base font-extrabold text-neutral-900 dark:text-white">
+                            {singleVideo.duration === 'Image' ? 'Instagram photo' : 'Instagram reel'}
+                          </h3>
+                        )}
                       </div>
 
-                      {/* Caption */}
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
-                          Caption
-                        </span>
-                        <p className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed max-h-32 overflow-y-auto select-text pr-1">
-                          {singleVideo.caption}
-                        </p>
-                      </div>
-
-                      {/* Engagement stats */}
-                      <div className="grid grid-cols-2 gap-2.5">
-                        <div className="bg-white dark:bg-zinc-950 p-2.5 rounded-card border border-neutral-200/40 dark:border-neutral-800/60 text-center">
-                          <Eye className="w-3.5 h-3.5 text-instagram-pink mx-auto mb-1" />
-                          <span className="text-[9px] text-neutral-400 block uppercase font-bold">Views</span>
-                          <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">{formatNumber(singleVideo.views)}</span>
+                      {/* Caption, with hashtags and mentions highlighted like on Instagram */}
+                      {singleVideo.caption && (
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
+                            Caption
+                          </span>
+                          <p className="text-[13px] text-neutral-700 dark:text-neutral-300 leading-relaxed max-h-40 overflow-y-auto whitespace-pre-line break-words select-text pr-1">
+                            {singleVideo.caption.split(/([#@][\p{L}\p{N}_.]+)/u).map((part, i) =>
+                              /^[#@]/.test(part) ? (
+                                <span key={i} className="font-semibold text-[#4f5bd5] dark:text-[#8ea1ff]">{part}</span>
+                              ) : (
+                                part
+                              )
+                            )}
+                          </p>
                         </div>
+                      )}
 
-                        <div className="bg-white dark:bg-zinc-950 p-2.5 rounded-card border border-neutral-200/40 dark:border-neutral-800/60 text-center">
-                          <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500/10 mx-auto mb-1" />
-                          <span className="text-[9px] text-neutral-400 block uppercase font-bold">Likes</span>
-                          <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">{formatNumber(singleVideo.likes)}</span>
+                      {/* Engagement stats: only shown when the source gave real numbers */}
+                      {(singleVideo.views > 0 || singleVideo.likes > 0) && (
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <div className="bg-white dark:bg-zinc-950 p-2.5 rounded-card border border-neutral-200/40 dark:border-neutral-800/60 text-center">
+                            <Eye className="w-3.5 h-3.5 text-instagram-pink mx-auto mb-1" />
+                            <span className="text-[9px] text-neutral-400 block uppercase font-bold">Views</span>
+                            <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">{singleVideo.views > 0 ? formatNumber(singleVideo.views) : '—'}</span>
+                          </div>
+
+                          <div className="bg-white dark:bg-zinc-950 p-2.5 rounded-card border border-neutral-200/40 dark:border-neutral-800/60 text-center">
+                            <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500/10 mx-auto mb-1" />
+                            <span className="text-[9px] text-neutral-400 block uppercase font-bold">Likes</span>
+                            <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200">{singleVideo.likes > 0 ? formatNumber(singleVideo.likes) : '—'}</span>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
 
                     {/* Download section */}

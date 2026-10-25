@@ -11,6 +11,9 @@ export interface VideoItem {
   type: 'reel' | 'video';
   instagramUrl?: string;
   pinterestUrl?: string;
+  /** Instagram account that posted it, when the post details could be looked up. */
+  ownerUsername?: string;
+  ownerUrl?: string;
 }
 
 export interface ProfileData {

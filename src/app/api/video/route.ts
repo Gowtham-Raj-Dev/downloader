@@ -552,6 +552,68 @@ async function fetchFromFastDl(instaUrl: string): Promise<{ url: string; thumbna
   throw new Error("Invalid response format from FastDL");
 }
 
+interface InstagramMeta {
+  caption: string;
+  owner_username: string;
+  owner_url: string;
+  thumbnail: string;
+}
+
+// Post details (caption, author, cover image) from Instagram's public oEmbed endpoint.
+// The download sources above only return the file, so this fills in what the result card shows.
+// Like and view counts are not part of oEmbed and are left out.
+async function fetchInstagramMeta(instaUrl: string): Promise<InstagramMeta | null> {
+  try {
+    const shortcode = instaUrl.match(/\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/)?.[1];
+    if (!shortcode) return null;
+    const postUrl = `https://www.instagram.com/p/${shortcode}/`;
+    const res = await fetch(`https://www.instagram.com/api/v1/oembed/?url=${encodeURIComponent(postUrl)}`, {
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return {
+      caption: typeof json.title === 'string' ? json.title.trim() : '',
+      owner_username: json.author_name || '',
+      owner_url: json.author_url || '',
+      thumbnail: json.thumbnail_url || '',
+    };
+  } catch (err) {
+    console.warn('Instagram oEmbed lookup failed:', err instanceof Error ? err.message : err);
+    return null;
+  }
+}
+
+interface MediaDetail {
+  thumbnail: string;
+  url: string;
+  duration_s: number;
+  video_view_count: number;
+  is_image: boolean;
+}
+
+// Success response: the media found by a download source, plus the post details when oEmbed returned them.
+async function mediaResponse(mediaDetails: MediaDetail[], metaPromise: Promise<InstagramMeta | null>) {
+  const meta = await metaPromise;
+  if (meta?.thumbnail) {
+    for (const item of mediaDetails) {
+      if (!item.thumbnail) item.thumbnail = meta.thumbnail;
+    }
+  }
+  return NextResponse.json({
+    success: true,
+    data: {
+      media_details: mediaDetails,
+      post_info: {
+        likes: 0,
+        caption: meta?.caption || '',
+        owner_username: meta?.owner_username || '',
+        owner_url: meta?.owner_url || '',
+      },
+    },
+  });
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const url = searchParams.get('url');
@@ -559,6 +621,9 @@ export async function GET(request: NextRequest) {
   if (!url) {
     return NextResponse.json({ error: 'URL parameter is required' }, { status: 400 });
   }
+
+  // Runs alongside the media lookup so it adds no waiting time.
+  const metaPromise = fetchInstagramMeta(url);
 
   // 1. Try Cobalt API instances first (high speed, supports direct CDN tunneling)
   let cobaltInstances = [...FALLBACK_COBALT_INSTANCES];
@@ -643,8 +708,8 @@ export async function GET(request: NextRequest) {
   // If Cobalt succeeded, adapt response for frontend
   if (downloadResponse) {
     try {
-      const mediaDetails = [];
-      
+      const mediaDetails: MediaDetail[] = [];
+
       if (downloadResponse.status === 'tunnel' || downloadResponse.status === 'redirect') {
         const filename = (downloadResponse.filename || '').toLowerCase();
         let isImage = false;
@@ -683,16 +748,7 @@ export async function GET(request: NextRequest) {
       }
 
       if (mediaDetails.length > 0) {
-        return NextResponse.json({
-          success: true,
-          data: {
-            media_details: mediaDetails,
-            post_info: {
-              likes: 0,
-              caption: downloadResponse.filename || 'Instagram Media'
-            }
-          }
-        });
+        return mediaResponse(mediaDetails, metaPromise);
       }
     } catch (adaptErr) {
       console.error("Failed to adapt Cobalt response:", adaptErr);
@@ -704,22 +760,13 @@ export async function GET(request: NextRequest) {
     console.log(`All Cobalt instances failed or did not return media. Falling back to SnapClip scraper...`);
     const snapClipData = await fetchFromSnapClip(url);
     if (snapClipData && snapClipData.url) {
-      return NextResponse.json({
-        success: true,
-        data: {
-          media_details: [{
-            thumbnail: snapClipData.thumbnail || '',
-            url: snapClipData.url,
-            duration_s: 0,
-            video_view_count: 0,
-            is_image: !!snapClipData.isImage
-          }],
-          post_info: {
-            likes: 0,
-            caption: snapClipData.caption || 'Instagram Media'
-          }
-        }
-      });
+      return mediaResponse([{
+        thumbnail: snapClipData.thumbnail || '',
+        url: snapClipData.url,
+        duration_s: 0,
+        video_view_count: 0,
+        is_image: !!snapClipData.isImage
+      }], metaPromise);
     }
   } catch (snapClipErr) {
     console.error(`SnapClip fallback scraper failed:`, snapClipErr);
@@ -730,22 +777,13 @@ export async function GET(request: NextRequest) {
     console.log(`SnapClip failed. Falling back to SaveInsta scraper...`);
     const saveInstaData = await fetchFromSaveInsta(url);
     if (saveInstaData && saveInstaData.url) {
-      return NextResponse.json({
-        success: true,
-        data: {
-          media_details: [{
-            thumbnail: saveInstaData.thumbnail || '',
-            url: saveInstaData.url,
-            duration_s: 0,
-            video_view_count: 0,
-            is_image: !!saveInstaData.isImage
-          }],
-          post_info: {
-            likes: 0,
-            caption: saveInstaData.caption || 'Instagram Media'
-          }
-        }
-      });
+      return mediaResponse([{
+        thumbnail: saveInstaData.thumbnail || '',
+        url: saveInstaData.url,
+        duration_s: 0,
+        video_view_count: 0,
+        is_image: !!saveInstaData.isImage
+      }], metaPromise);
     }
   } catch (saveInstaErr) {
     console.error(`SaveInsta fallback scraper failed:`, saveInstaErr);
@@ -756,22 +794,13 @@ export async function GET(request: NextRequest) {
     console.log(`SaveInsta failed. Falling back to FastDL scraper...`);
     const fastDlData = await fetchFromFastDl(url);
     if (fastDlData && fastDlData.url) {
-      return NextResponse.json({
-        success: true,
-        data: {
-          media_details: [{
-            thumbnail: fastDlData.thumbnail || '',
-            url: fastDlData.url,
-            duration_s: 0,
-            video_view_count: 0,
-            is_image: !!fastDlData.isImage
-          }],
-          post_info: {
-            likes: 0,
-            caption: fastDlData.caption || 'Instagram Media'
-          }
-        }
-      });
+      return mediaResponse([{
+        thumbnail: fastDlData.thumbnail || '',
+        url: fastDlData.url,
+        duration_s: 0,
+        video_view_count: 0,
+        is_image: !!fastDlData.isImage
+      }], metaPromise);
     }
   } catch (fastDlErr) {
     console.error(`FastDL fallback scraper failed:`, fastDlErr);
@@ -781,7 +810,7 @@ export async function GET(request: NextRequest) {
   if (backupImageResponse) {
     try {
       console.log("All scrapers failed to extract video. Serving backup Cobalt image response.");
-      const mediaDetails = [];
+      const mediaDetails: MediaDetail[] = [];
       const filename = (backupImageResponse.filename || '').toLowerCase();
       let isImage = false;
       
@@ -805,16 +834,7 @@ export async function GET(request: NextRequest) {
         is_image: isImage
       });
 
-      return NextResponse.json({
-        success: true,
-        data: {
-          media_details: mediaDetails,
-          post_info: {
-            likes: 0,
-            caption: backupImageResponse.filename || 'Instagram Media'
-          }
-        }
-      });
+      return mediaResponse(mediaDetails, metaPromise);
     } catch (adaptBackupErr) {
       console.error("Failed to adapt backup Cobalt response:", adaptBackupErr);
     }
