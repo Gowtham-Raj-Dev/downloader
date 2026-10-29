@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Download } from 'lucide-react';
 import HeartButton from '@/components/HeartButton';
+import { ContactLinks } from '@/components/ContactLinks';
 import { CODELOVE_GUIDES, CODELOVE_NETWORK } from '@/lib/site';
 
 const COLUMNS = [
@@ -130,6 +131,8 @@ export default function Footer() {
             <a href="https://codelove.in" target="_blank" rel="noopener noreferrer" className="font-medium text-neutral-900 dark:text-white hover:text-instagram-pink transition-colors">
               CodeLove
             </a>
+            <span aria-hidden="true">·</span>
+            <ContactLinks className="text-neutral-900 dark:text-white" />
           </p>
         </div>
       </div>

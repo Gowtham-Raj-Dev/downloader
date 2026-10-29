@@ -3,7 +3,7 @@ import HomeContent from '@/components/HomeContent';
 import { pageMetadata } from '@/lib/site';
 
 export const metadata: Metadata = pageMetadata({
-  title: { absolute: "Insta Downloader - Download Instagram Reels, Videos & Photos Free" },
+  title: { absolute: "Insta Downloader by CodeLove - Download Instagram Reels, Videos & Photos Free" },
   description: "Free Insta Downloader: save public Instagram Reels, videos and photos in HD with no watermark and no login. Works on iPhone, Android and PC. Pinterest downloads too.",
   path: "",
   keywords: [
