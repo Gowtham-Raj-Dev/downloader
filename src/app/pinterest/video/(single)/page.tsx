@@ -12,6 +12,7 @@ import PreviewModal from '@/components/PreviewModal';
 import LimitExceededModal from '@/components/LimitExceededModal';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import PinterestGuide from '@/components/PinterestGuide';
 import {
   isPinterestVideoUrl,
   extractVideoShortcode,
@@ -274,6 +275,8 @@ export default function PinterestPage() {
                     </p>
                   </div>
                 </div>
+
+                <PinterestGuide mode="video" />
               </motion.div>
             )}
 
