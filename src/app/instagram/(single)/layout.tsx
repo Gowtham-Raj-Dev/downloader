@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { pageMetadata, toolJsonLd } from '@/lib/site';
 
 export const metadata: Metadata = pageMetadata({
-  title: "Instagram Reels & Video Downloader - Free, HD, No Watermark",
+  title: "Instagram Reels & Video Downloader",
   description: "Paste an Instagram link to download public Reels, videos and photos in HD. Free Insta Downloader with no login and no watermark, on iPhone, Android and PC.",
   path: "/instagram",
   keywords: [

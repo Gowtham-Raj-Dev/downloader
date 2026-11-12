@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { pageMetadata, toolJsonLd } from '@/lib/site';
 
 export const metadata: Metadata = pageMetadata({
-  title: "Pinterest Image Downloader - Download High Quality Pinterest Pictures",
+  title: "Pinterest Image & Picture Downloader",
   description: "Best Pinterest Image Downloader. Fast, free, and high-quality Pinterest photo and picture downloader. Save your favorite pins directly to your device.",
   path: "/pinterest/image",
   keywords: [

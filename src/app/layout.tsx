@@ -4,8 +4,8 @@ import "./globals.css";
 import { ADSENSE_CLIENT } from "@/lib/adsense";
 import { CODELOVE_NETWORK, CREATOR_NAME, CREATOR_URL, MAIN_SITE_URL, OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 
-const TITLE = "Insta Downloader - Download Instagram Reels, Videos & Photos Free";
-const DESCRIPTION = "Free Insta Downloader: save public Instagram Reels, videos and photos in HD with no watermark and no login. Works on iPhone, Android and PC. Pinterest downloads too.";
+const TITLE = "Insta Downloader — Save Reels, Video & Photos Free";
+const DESCRIPTION = "Free Insta Downloader: save Instagram Reels, videos & photos in HD with no watermark and no login on iPhone, Android and PC — Pinterest too.";
 
 // Defaults only. Each page sets its own title, description and canonical through pageMetadata().
 export const metadata: Metadata = {
@@ -120,6 +120,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
+        <link rel="sitemap" type="application/xml" href="https://downloader.codelove.in/sitemap.xml" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
         {/* Google AdSense - only rendered once a publisher ID is set in src/lib/adsense.ts */}

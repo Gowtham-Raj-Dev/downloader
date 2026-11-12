@@ -1,0 +1,16 @@
+# Insta Downloader (by CodeLove)
+
+> Free online downloader for public Instagram Reels, videos, photos, and Pinterest videos and images in HD with no watermark and no login.
+
+## Tools
+- [Instagram Video & Reels Downloader](https://downloader.codelove.in/instagram): Save Instagram Reels, videos, carousels, and photos.
+- [Multi-Link Instagram Downloader](https://downloader.codelove.in/instagram/multi-url): Batch extract Instagram links.
+- [Pinterest Video Downloader](https://downloader.codelove.in/pinterest/video): Save Pinterest video pins in HD MP4.
+- [Pinterest Image Downloader](https://downloader.codelove.in/pinterest/image): Save high-resolution Pinterest pin images.
+
+## Companion CodeLove Tools
+- [CodeLove](https://codelove.in)
+- [Video Cut (Shorts Cutter)](https://videocut.codelove.in)
+- [Video to GIF](https://videotogif.codelove.in)
+- [Video to Images](https://videotoimages.codelove.in)
+

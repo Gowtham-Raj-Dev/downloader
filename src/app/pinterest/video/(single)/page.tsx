@@ -249,7 +249,7 @@ export default function PinterestPage() {
                     <div className="w-10 h-10 rounded-full bg-red-700/10 text-red-700 flex items-center justify-center mx-auto mb-3">
                       <ShieldCheck className="w-5 h-5" />
                     </div>
-                    <h4 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-1">No Login Required</h4>
+                    <h2 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-1">No Login Required</h2>
                     <p className="text-xs text-neutral-500 dark:text-neutral-500 leading-relaxed">
                       Extract and download public Pinterest videos instantly without needing passwords or authorization.
                     </p>
@@ -259,7 +259,7 @@ export default function PinterestPage() {
                     <div className="w-10 h-10 rounded-full bg-[#E60023]/10 text-[#E60023] flex items-center justify-center mx-auto mb-3">
                       <Sparkles className="w-5 h-5" />
                     </div>
-                    <h4 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-1">Single Video Extractor</h4>
+                    <h2 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-1">Single Video Extractor</h2>
                     <p className="text-xs text-neutral-500 dark:text-neutral-500 leading-relaxed">
                       Paste any post or reel link to fetch details, play the media, and trigger direct downloads instantly.
                     </p>
@@ -269,7 +269,7 @@ export default function PinterestPage() {
                     <div className="w-10 h-10 rounded-full bg-red-600/10 text-red-600 flex items-center justify-center mx-auto mb-3">
                       <Pinterest className="w-5 h-5" />
                     </div>
-                    <h4 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-1">Multiple Links Extractor</h4>
+                    <h2 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-1">Multiple Links Extractor</h2>
                     <p className="text-xs text-neutral-500 dark:text-neutral-500 leading-relaxed">
                       Paste multiple post links at once to extract and download all videos individually.
                     </p>
