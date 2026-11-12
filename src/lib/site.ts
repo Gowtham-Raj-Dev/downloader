@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 export const SITE_URL = 'https://downloader.codelove.in';
 export const SITE_NAME = 'Insta Downloader by CodeLove';
 export const MAIN_SITE_URL = 'https://codelove.in';
+export const CREATOR_NAME = 'Gowtham';
+export const CREATOR_URL = 'https://gowtham.codelove.in';
 export const CONTACT_EMAIL = 'support@codelove.in';
 
 // Shared social preview image (public/og.png, 1200x630).
@@ -16,11 +18,13 @@ export const OG_IMAGE = {
 // Other CodeLove sites, linked from the footer.
 export const CODELOVE_NETWORK = [
   { name: 'CodeLove', href: 'https://codelove.in' },
+  { name: 'Gowtham Portfolio', href: 'https://gowtham.codelove.in' },
   { name: 'Free 3D Models', href: 'https://models.codelove.in' },
   { name: 'Free 3D Games', href: 'https://games.codelove.in' },
   { name: 'Link in Bio', href: 'https://linkinbio.codelove.in' },
   { name: 'Video to GIF', href: 'https://videotogif.codelove.in' },
   { name: 'Video to Images', href: 'https://videotoimages.codelove.in' },
+  { name: 'Video Cut', href: 'https://videocut.codelove.in' },
   { name: 'Free YouTube Automation', href: 'https://utubeflow.codelove.in' },
   { name: 'Free Java Games', href: 'https://javaplay.codelove.in' },
 ];
@@ -92,6 +96,7 @@ export function toolJsonLd({ name, description, path, crumbs }: ToolSchema) {
         operatingSystem: 'All',
         isAccessibleForFree: true,
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        creator: { '@id': `${CREATOR_URL}/#person` },
         publisher: { '@id': `${MAIN_SITE_URL}/#organization` },
       },
       {

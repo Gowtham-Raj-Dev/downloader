@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { ADSENSE_CLIENT } from "@/lib/adsense";
-import { MAIN_SITE_URL, OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
+import { CODELOVE_NETWORK, CREATOR_NAME, CREATOR_URL, MAIN_SITE_URL, OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const TITLE = "Insta Downloader - Download Instagram Reels, Videos & Photos Free";
 const DESCRIPTION = "Free Insta Downloader: save public Instagram Reels, videos and photos in HD with no watermark and no login. Works on iPhone, Android and PC. Pinterest downloads too.";
@@ -36,12 +36,15 @@ export const metadata: Metadata = {
     "pinterest video download",
     "save instagram reels",
     "download reels without watermark",
+    "ai video reels download",
     "codelove downloader",
-    "codelove"
+    "codelove",
+    "code love",
+    "video cut"
   ],
   applicationName: SITE_NAME,
-  authors: [{ name: "CodeLove", url: MAIN_SITE_URL }],
-  creator: "CodeLove",
+  authors: [{ name: CREATOR_NAME, url: CREATOR_URL }],
+  creator: CREATOR_NAME,
   publisher: "CodeLove",
   category: "technology",
   formatDetection: {
@@ -81,18 +84,29 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "Person",
+      "@id": `${CREATOR_URL}/#person`,
+      "name": CREATOR_NAME,
+      "url": CREATOR_URL,
+      "worksFor": { "@id": `${MAIN_SITE_URL}/#organization` }
+    },
+    {
       "@type": "Organization",
       "@id": `${MAIN_SITE_URL}/#organization`,
       "name": "CodeLove",
-      "url": MAIN_SITE_URL
+      "url": MAIN_SITE_URL,
+      "founder": { "@id": `${CREATOR_URL}/#person` },
+      "sameAs": CODELOVE_NETWORK.map((s) => s.href)
     },
     {
       "@type": "WebSite",
       "@id": `${SITE_URL}/#website`,
       "name": SITE_NAME,
+      "alternateName": ["Insta Downloader", "CodeLove Downloader", "downloader.codelove.in"],
       "url": SITE_URL,
       "description": DESCRIPTION,
       "inLanguage": "en",
+      "creator": { "@id": `${CREATOR_URL}/#person` },
       "publisher": { "@id": `${MAIN_SITE_URL}/#organization` }
     }
   ]
