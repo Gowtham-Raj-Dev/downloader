@@ -25,6 +25,7 @@ export const CODELOVE_NETWORK = [
   { name: 'Video to GIF', href: 'https://videotogif.codelove.in' },
   { name: 'Video to Images', href: 'https://videotoimages.codelove.in' },
   { name: 'Video Cut', href: 'https://videocut.codelove.in' },
+  { name: 'Free AI Video Maker', href: 'https://videomaker.codelove.in' },
   { name: 'Free YouTube Automation', href: 'https://utubeflow.codelove.in' },
   { name: 'Free Java Games', href: 'https://javaplay.codelove.in' },
 ];
