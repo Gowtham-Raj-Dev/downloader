@@ -1,16 +1,22 @@
-import { Metadata } from 'next';
+﻿import { Metadata } from 'next';
 import InfoPage, { InfoLink, InfoSection } from '@/components/InfoPage';
 import { CONTACT_EMAIL, pageMetadata } from '@/lib/site';
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Terms & Conditions',
-  description: 'The terms for using Insta Downloader, including acceptable use, copyright responsibilities and limits of liability.',
+  title: { absolute: 'Terms of Use for Insta Downloader | Rules & Copyright' },
+  description: 'Rules for using Insta Downloader: personal use only, respect creators'' copyright, no private content, and what we are and are not responsible for.',
   path: '/terms',
 });
 
 export default function TermsConditionsPage() {
   return (
-    <InfoPage title="Terms & Conditions" lastUpdated="October 10, 2026">
+    <InfoPage title="Terms of Use for Insta Downloader" lastUpdated="October 10, 2026">
+      <InfoSection heading="The short version">
+        <p>
+          Insta Downloader is a free tool for saving public Instagram Reels, videos and photos and public Pinterest videos and images. Use it for your own content or for media you have permission to keep, credit the people who made it, and never re-upload or sell their work. We do not host any media, we cannot reach private accounts, and the service is offered as it is. The numbered sections below explain each point in full.
+        </p>
+      </InfoSection>
+
       <InfoSection heading="1. Acceptance of Terms">
         <p>
           By accessing and using Insta Downloader, you agree to be bound by these Terms and Conditions. If you disagree with any part of these terms, you may not access the service.
@@ -60,3 +66,4 @@ export default function TermsConditionsPage() {
     </InfoPage>
   );
 }
+
