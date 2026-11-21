@@ -4,7 +4,7 @@ import { CONTACT_EMAIL, pageMetadata } from '@/lib/site';
 
 export const metadata: Metadata = pageMetadata({
   title: { absolute: 'Terms of Use for Insta Downloader | Rules & Copyright' },
-  description: 'Rules for using Insta Downloader: personal use only, respect creators'' copyright, no private content, and what we are and are not responsible for.',
+  description: 'Rules for using Insta Downloader: personal use only, respect creator copyright, no private content, and what we are and are not responsible for.',
   path: '/terms',
 });
 
@@ -66,4 +66,5 @@ export default function TermsConditionsPage() {
     </InfoPage>
   );
 }
+
 
